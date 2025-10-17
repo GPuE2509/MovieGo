@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Ticket Booking Payment Confirmation</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #141414;
+            margin: 0;
+            padding: 0;
+        }
+
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #221f1f;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .header {
+            background-color: #e50914;
+            padding: 20px;
+            text-align: center;
+            color: #ffffff;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .content {
+            padding: 30px;
+            text-align: center;
+            color: #ffffff;
+        }
+
+        .content p {
+            color: #b3b3b3;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .qr-code {
+            margin: 20px 0;
+            background-color: #333333;
+            padding: 15px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+
+        .payment-details {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .payment-details th, .payment-details td {
+            padding: 10px;
+            border: 1px solid #444444;
+            text-align: left;
+            color: #b3b3b3;
+        }
+
+        .payment-details th {
+            background-color: #333333;
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        .footer {
+            background-color: #1c1c1c;
+            padding: 15px;
+            text-align: center;
+            font-size: 12px;
+            color: #757575;
+        }
+
+        @media only screen and (max-width: 600px) {
+            .email-container {
+                width: 100%;
+                margin: 10px;
+            }
+
+            .qr-code img {
+                width: 150px;
+                height: 150px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .payment-details th, .payment-details td {
+                font-size: 14px;
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="email-container">
+    <div class="header">
+        <h1>Movie Ticket Booking</h1>
+    </div>
+    <div class="content">
+        <p>Xin chào,</p>
+        <p>Cảm ơn bạn đã thanh toán! Dưới đây là chi tiết giao dịch của bạn:</p>
+        <table class="payment-details">
+            <tr>
+                <th>Mã giao dịch</th>
+                <td>${transactionId}</td>
+            </tr>
+            <tr>
+                <th>Số tiền</th>
+                <td>${amount} VND</td>
+            </tr>
+            <tr>
+                <th>Thời gian thanh toán</th>
+                <td>${paymentTime}</td>
+            </tr>
+            <tr>
+                <th>Tên phim</th>
+                <td>${movieTitle}</td>
+            </tr>
+            <tr>
+                <th>Rạp chiếu</th>
+                <td>${theaterName}</td>
+            </tr>
+            <tr>
+                <th>Phòng chiếu</th>
+                <td>${screenName}</td>
+            </tr>
+            <tr>
+                <th>Ghế</th>
+                <td>${seatNames}</td>
+            </tr>
+            <tr>
+                <th>Thời gian chiếu</th>
+                <td>${showtime}</td>
+            </tr>
+            <tr>
+                <th>Phương thức thanh toán</th>
+                <td>${paymentMethod}</td>
+            </tr>
+        </table>
+        <p>Vui lòng quét mã QR dưới đây để xem chi tiết giao dịch:</p>
+        <div class="qr-code">
+            <img src="cid:qrCode" alt="Payment QR Code" style="width: 200px; height: 200px;"/>
+        </div>
+        <p>Nếu bạn có bất kỳ câu hỏi nào, hãy liên hệ với đội ngũ hỗ trợ của chúng tôi tại <a href="mailto:support@movieticketbooking.com" style="color: #e50914;">support@movieticketbooking.com</a>.</p>
+    </div>
+    <div class="footer">
+        <p>© 2025 Movie Ticket Booking. Mọi quyền được bảo lưu.</p>
+    </div>
+</div>
+</body>
+</html>

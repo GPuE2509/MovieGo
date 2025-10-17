@@ -1,0 +1,117 @@
+spring:
+  main:
+    allow-circular-references: true
+  config:
+    import: optional:file:.env[.properties]
+  application:
+    name: base_spring_boot
+  datasource:
+    url: jdbc:mysql://${MYSQL_DB_HOST}:${MYSQL_DB_PORT}/${MYSQL_DATABASE}?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&useUnicode=true&connectionCollation=utf8mb4_unicode_ci
+    username: ${MYSQL_USER}
+    password: ${MYSQL_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jooq:
+    sql-dialect: MYSQL
+  jpa:
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: Asia/Ho_Chi_Minh
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+        naming:
+          physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+          implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+    test-connection: true
+    default-encoding: UTF-8
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+  jackson:
+    time-zone: Asia/Ho_Chi_Minh
+    date-format: "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+    deserialization:
+      accept-single-value-as-array: true
+      fail-on-unknown-properties: false
+  cache:
+    type: ${SPRING_CACHE_TYPE}
+
+server:
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain
+    min-response-size: 1024
+    encoding: gzip
+
+# Cloudinary configuration
+cloudinary:
+  cloud-name: ${CLOUDINARY_CLOUD_NAME}
+  api-key: ${CLOUDINARY_API_KEY}
+  api-secret: ${CLOUDINARY_API_SECRET}
+
+# JWT configuration
+jwt:
+  secret:
+    key: ${JWT_SECRET_KEY}
+  expired:
+    access: 86400000 # 24h (milliseconds)
+
+# VNPay configuration
+vnpay:
+  tmnCode: ${VNPAY_TMN_CODE}
+  hashSecret: ${VNPAY_HASH_SECRET}
+  payUrl: ${VNPAY_PAY_URL}
+  returnUrl: ${VNPAY_RETURN_URL}
+  ipnUrl: ${VNPAY_IPN_URL}
+
+# PayPal configuration
+paypal:
+  mode: ${PAYPAL_MODE}
+  client-id: ${PAYPAL_CLIENT_ID}
+  client-secret: ${PAYPAL_CLIENT_SECRET}
+  returnUrl: ${PAYPAL_RETURN_URL}
+  cancelUrl: ${PAYPAL_CANCEL_URL}
+
+# MoMo configuration
+momo:
+  partnerCode: ${MOMO_PARTNER_CODE}
+  accessKey: ${MOMO_ACCESS_KEY}
+  secretKey: ${MOMO_SECRET_KEY}
+  payUrl: ${MOMO_PAY_URL}
+  returnUrl: ${MOMO_RETURN_URL}
+  ipnUrl: ${MOMO_IPN_URL}
+
+# ExchangeRate-API (VND/USD) configuration
+exchange:
+  rate:
+    api:
+      url: ${EXCHANGE_RATE_API_URL}
+      key: ${EXCHANGE_RATE_API_KEY}
+
+frontend:
+  base:
+    url: ${VITE_BASE_URL}
