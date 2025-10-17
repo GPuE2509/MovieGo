@@ -1,26 +1,44 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+require('dotenv').config();
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const cors = require('cors');
+const connectDB = require('./src/config/database');
 
-var indexRouter = require('./src/routes/index');
-var usersRouter = require('./src/routes/users');
+// Connect to database
+connectDB();
 
-var app = express();
+const authRouter = require('./src/routes/auth');
+
+const app = express();
+
+// CORS configuration
+app.use(cors({
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'https://movie-booking-vert-rho.vercel.app',
+    'https://movie-booking-back.vercel.app',
+    'https://movieticketbooking.io.vn',
+    'https://www.movieticketbooking.io.vn'
+  ],
+  credentials: true
+}));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 
 app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: false, limit: '10mb' }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+
+app.use('/api/v1/auth', authRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
