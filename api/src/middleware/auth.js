@@ -1,33 +1,43 @@
-const jwt = require('jsonwebtoken');
-const User = require('../models/user');
+const jwt = require("jsonwebtoken");
+const User = require("../models/user");
 
 const auth = async (req, res, next) => {
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
-    
+    const token = req.header("Authorization")?.replace("Bearer ", "");
+
     if (!token) {
       return res.status(401).json({
         success: false,
-        message: 'Access denied. No token provided.'
+        message: "Access denied. No token provided.",
       });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id).select('-password');
-    
+    const user = await User.findById(decoded.id)
+      .populate("roles")
+      .select("-password");
+
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: 'Token is not valid.'
+        message: "Token is not valid.",
       });
     }
 
-    req.user = user;
+    // Add role information to req.user
+    req.user = {
+      id: user._id,
+      email: user.email,
+      role:
+        user.roles && user.roles.length > 0
+          ? user.roles[0].role_name
+          : "ROLE_USER",
+    };
     next();
   } catch (error) {
     return res.status(401).json({
       success: false,
-      message: 'Token is not valid.'
+      message: "Token is not valid.",
     });
   }
 };
@@ -37,14 +47,14 @@ const authorize = (...roles) => {
     if (!req.user) {
       return res.status(401).json({
         success: false,
-        message: 'Access denied. Please login first.'
+        message: "Access denied. Please login first.",
       });
     }
 
     if (!roles.includes(req.user.role)) {
       return res.status(403).json({
         success: false,
-        message: 'Access denied. Insufficient permissions.'
+        message: "Access denied. Insufficient permissions.",
       });
     }
 
@@ -52,7 +62,22 @@ const authorize = (...roles) => {
   };
 };
 
+// Middleware to check if the user has ADMIN role
+const adminMiddleware = (req, res, next) => {
+  if (req.user && req.user.role === "ROLE_ADMIN") {
+    next();
+  } else {
+    res.status(403).json({
+      status: "ERROR",
+      code: 403,
+      data: null,
+      message: "Access denied. Admin role required.",
+    });
+  }
+};
+
 module.exports = {
   auth,
-  authorize
+  authorize,
+  adminMiddleware,
 };
