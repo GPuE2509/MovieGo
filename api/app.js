@@ -11,6 +11,8 @@ const connectDB = require('./src/config/database');
 connectDB();
 
 const authRouter = require('./src/routes/auth');
+const adminMovieRouter = require('./src/routes/admin/movie');
+const homeRouter = require('./src/routes/home');
 
 const app = express();
 
@@ -39,6 +41,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/admin', adminMovieRouter);
+app.use('/api/v1/home', homeRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
