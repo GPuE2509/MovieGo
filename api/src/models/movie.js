@@ -7,7 +7,7 @@ const movieSchema = new mongoose.Schema({
   author: { type: String, required: true, maxlength: 100 },
   image: { type: String, maxlength: 255 },
   trailer: { type: String, maxlength: 255 },
-  type: { type: String, enum: ['2D', '3D'], required: true },
+  type: { type: String, enum: ['2D', '3D', '4DX', 'IMAX'], required: true },
   duration: { type: Number, min: 1, required: true },
   release_date: { type: Date },
   actors: { type: String }, // Added missing field
