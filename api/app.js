@@ -16,6 +16,8 @@ const adminBookingRouter = require("./src/routes/admin/booking");
 const adminFestivalRouter = require("./src/routes/admin/festival");
 const homeRouter = require("./src/routes/home");
 const homeAliasRouter = require("./src/routes/homeAlias");
+const adminGenreRouter = require('./src/routes/admin/genre');
+const adminNewsRouter = require('./src/routes/admin/news');
 
 const app = express();
 
@@ -46,6 +48,8 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/admin", adminMovieRouter);
+app.use("/api/v1/admin", adminGenreRouter);
+app.use("/api/v1/admin", adminNewsRouter);
 app.use("/api/v1/admin", adminBookingRouter);
 app.use("/api/v1/admin", adminFestivalRouter);
 app.use("/api/v1/home", homeRouter);
