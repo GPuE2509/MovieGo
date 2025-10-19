@@ -13,8 +13,9 @@ connectDB();
 const authRouter = require("./src/routes/auth");
 const adminMovieRouter = require("./src/routes/admin/movie");
 const adminBookingRouter = require("./src/routes/admin/booking");
+const adminFestivalRouter = require("./src/routes/admin/festival");
 const homeRouter = require("./src/routes/home");
-const homeAliasRouter = require('./src/routes/homeAlias');
+const homeAliasRouter = require("./src/routes/homeAlias");
 
 const app = express();
 
@@ -46,8 +47,9 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/admin", adminMovieRouter);
 app.use("/api/v1/admin", adminBookingRouter);
+app.use("/api/v1/admin", adminFestivalRouter);
 app.use("/api/v1/home", homeRouter);
-app.use('/api/v1', homeAliasRouter);
+app.use("/api/v1", homeAliasRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
