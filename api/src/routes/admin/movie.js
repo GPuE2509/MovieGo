@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const movieController = require('../../controllers/movieController');
 const upload = require('../../middleware/upload');
-const { auth } = require('../../middleware/auth');
+const { auth, adminMiddleware } = require('../../middleware/auth');
 const {
   movieQueryValidation,
   createMovieValidation,
@@ -10,25 +10,25 @@ const {
 } = require('../../dto/request/movieDto');
 
 // List movies (admin)
-router.get('/movies', auth, movieQueryValidation, movieController.getAllMovies);
+router.get('/movies', auth, adminMiddleware, movieQueryValidation, movieController.getAllMovies);
 
 // Get by id (admin)
-router.get('/movie/:id', auth, movieController.getMovieById);
+router.get('/movie/:id', auth, adminMiddleware, movieController.getMovieById);
 
 // Create (admin) - multipart/form-data
-router.post('/movie/create', auth, upload.single('image'), createMovieValidation, movieController.createMovie);
+router.post('/movie/create', auth, adminMiddleware, upload.single('image'), createMovieValidation, movieController.createMovie);
 
 // Update details (admin)
-router.put('/movie/update/:id', auth, updateMovieValidation, movieController.updateMovie);
+router.put('/movie/update/:id', auth, adminMiddleware, updateMovieValidation, movieController.updateMovie);
 
 // Update image (admin) - multipart/form-data
-router.patch('/movie/update/image/:id', auth, upload.single('image'), movieController.updateMovieImage);
+router.patch('/movie/update/image/:id', auth, adminMiddleware, upload.single('image'), movieController.updateMovieImage);
 
 // Delete (admin)
-router.delete('/movie/delete/:id', auth, movieController.deleteMovie);
+router.delete('/movie/delete/:id', auth, adminMiddleware, movieController.deleteMovie);
 
 // Extra: genres list for admin forms
-router.get('/genres', auth, async (req, res) => {
+router.get('/genres', auth, adminMiddleware, async (req, res) => {
   try {
     const movieService = require('../../services/movieService');
     const genres = await movieService.getAllGenres();
