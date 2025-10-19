@@ -1,10 +1,10 @@
-const { Types } = require('mongoose');
-const Movie = require('../models/movie');
-const Genre = require('../models/genre');
-const News = require('../models/news');
-const Festival = require('../models/festival');
-const Promotion = require('../models/promotion');
-const TicketPrice = require('../models/ticketPrice');
+const { Types } = require("mongoose");
+const Movie = require("../models/movie");
+const Genre = require("../models/genre");
+const News = require("../models/news");
+const Festival = require("../models/festival");
+const Promotion = require("../models/promotion");
+const TicketPrice = require("../models/ticketPrice");
 
 class HomeService {
   // Genres
@@ -23,10 +23,10 @@ class HomeService {
     const movies = await Movie.find({
       $or: [
         { release_date: { $lte: now } },
-        { release_date: { $exists: false } }
-      ]
+        { release_date: { $exists: false } },
+      ],
     })
-      .populate('genres')
+      .populate("genres")
       .sort({ created_at: -1 })
       .lean();
 
@@ -39,7 +39,7 @@ class HomeService {
     const filter = { release_date: { $gt: now } };
     const total = await Movie.countDocuments(filter);
     const rows = await Movie.find(filter)
-      .populate('genres')
+      .populate("genres")
       .sort({ release_date: 1 })
       .skip(page * pageSize)
       .limit(pageSize)
@@ -53,31 +53,37 @@ class HomeService {
       data,
       totalPages: Math.ceil(total / pageSize) || 0,
       hasNext: page < Math.ceil(total / pageSize) - 1,
-      hasPrevious: page > 0
+      hasPrevious: page > 0,
     };
   }
 
   // Movie detail
   async getMovieDetail(id) {
-    const movie = await Movie.findById(id).populate('genres').lean();
-    if (!movie) throw new Error('Movie not found');
+    const movie = await Movie.findById(id).populate("genres").lean();
+    if (!movie) throw new Error("Movie not found");
     return this.convertToMovieResponse(movie);
   }
 
   // Movie trailer only
   async getMovieTrailer(id) {
     const movie = await Movie.findById(id).lean();
-    if (!movie) throw new Error('Movie not found');
+    if (!movie) throw new Error("Movie not found");
     return movie.trailer || null;
   }
 
   // News list
-  async getAllNews(page = 0, pageSize = 10, sortField = 'title', sortOrder = 'asc', search = '') {
+  async getAllNews(
+    page = 0,
+    pageSize = 10,
+    sortField = "title",
+    sortOrder = "asc",
+    search = ""
+  ) {
     const filter = {};
-    if (search) filter.title = { $regex: search, $options: 'i' };
+    if (search) filter.title = { $regex: search, $options: "i" };
     const total = await News.countDocuments(filter);
     const data = await News.find(filter)
-      .sort({ [sortField]: sortOrder.toLowerCase() === 'desc' ? -1 : 1 })
+      .sort({ [sortField]: sortOrder.toLowerCase() === "desc" ? -1 : 1 })
       .skip(page * pageSize)
       .limit(pageSize)
       .lean();
@@ -88,52 +94,86 @@ class HomeService {
       data,
       totalPages: Math.ceil(total / pageSize) || 0,
       hasNext: page < Math.ceil(total / pageSize) - 1,
-      hasPrevious: page > 0
+      hasPrevious: page > 0,
     };
   }
 
   // News detail
   async getNewsById(id) {
     const news = await News.findById(id).lean();
-    if (!news) throw new Error('News not found');
+    if (!news) throw new Error("News not found");
     return news;
   }
 
   // Festivals list
-  async getAllFestivals(page = 0, pageSize = 10, sortField = 'name', sortOrder = 'asc', search = '') {
+  async getAllFestivals(
+    page = 0,
+    pageSize = 10,
+    sortField = "title",
+    sortOrder = "asc",
+    search = ""
+  ) {
     const filter = {};
-    if (search) filter.name = { $regex: search, $options: 'i' };
+    if (search) filter.title = { $regex: search, $options: "i" };
     const total = await Festival.countDocuments(filter);
     const data = await Festival.find(filter)
-      .sort({ [sortField]: sortOrder.toLowerCase() === 'desc' ? -1 : 1 })
+      .sort({ [sortField]: sortOrder.toLowerCase() === "desc" ? -1 : 1 })
       .skip(page * pageSize)
       .limit(pageSize)
       .lean();
+
+    // Transform data to match Spring Boot response format
+    const festivalData = data.map((festival) => ({
+      id: festival._id,
+      title: festival.title,
+      image: festival.image,
+      startTime: festival.start_time,
+      endTime: festival.end_time,
+      description: festival.description || "",
+      location: festival.location || "",
+    }));
+
     return {
       total,
       page,
       size: pageSize,
-      data,
+      data: festivalData,
       totalPages: Math.ceil(total / pageSize) || 0,
       hasNext: page < Math.ceil(total / pageSize) - 1,
-      hasPrevious: page > 0
+      hasPrevious: page > 0,
     };
   }
 
   // Festival detail
   async getFestivalDetail(id) {
     const festival = await Festival.findById(id).lean();
-    if (!festival) throw new Error('Festival not found');
-    return festival;
+    if (!festival) throw new Error("Festival not found");
+
+    // Transform data to match Spring Boot response format
+    return {
+      id: festival._id,
+      title: festival.title,
+      image: festival.image,
+      startTime: festival.start_time,
+      endTime: festival.end_time,
+      description: festival.description || "",
+      location: festival.location || "",
+    };
   }
 
   // Promotions list
-  async getAllPromotions(page = 0, pageSize = 10, sortField = 'title', sortOrder = 'asc', search = '') {
+  async getAllPromotions(
+    page = 0,
+    pageSize = 10,
+    sortField = "title",
+    sortOrder = "asc",
+    search = ""
+  ) {
     const filter = {};
-    if (search) filter.title = { $regex: search, $options: 'i' };
+    if (search) filter.title = { $regex: search, $options: "i" };
     const total = await Promotion.countDocuments(filter);
     const data = await Promotion.find(filter)
-      .sort({ [sortField]: sortOrder.toLowerCase() === 'desc' ? -1 : 1 })
+      .sort({ [sortField]: sortOrder.toLowerCase() === "desc" ? -1 : 1 })
       .skip(page * pageSize)
       .limit(pageSize)
       .lean();
@@ -144,14 +184,14 @@ class HomeService {
       data,
       totalPages: Math.ceil(total / pageSize) || 0,
       hasNext: page < Math.ceil(total / pageSize) - 1,
-      hasPrevious: page > 0
+      hasPrevious: page > 0,
     };
   }
 
   // Promotion detail
   async getPromotionDetail(id) {
     const promotion = await Promotion.findById(id).lean();
-    if (!promotion) throw new Error('Promotion not found');
+    if (!promotion) throw new Error("Promotion not found");
     return promotion;
   }
 
@@ -176,7 +216,9 @@ class HomeService {
       releaseDate: movie.release_date,
       createdAt: movie.created_at,
       updatedAt: movie.updated_at,
-      genreNames: Array.isArray(movie.genres) ? movie.genres.map(g => g.genre_name) : []
+      genreNames: Array.isArray(movie.genres)
+        ? movie.genres.map((g) => g.genre_name)
+        : [],
     };
   }
 }
