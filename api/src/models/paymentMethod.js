@@ -1,9 +1,14 @@
 // models/paymentMethod.model.js
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const paymentMethodSchema = new mongoose.Schema({
-  method_name: { type: String, required: true, unique: true },
-  is_active: { type: Boolean, default: true },
-}, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } });
+const paymentMethodSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true, unique: true, maxlength: 100 },
+    description: { type: String, maxlength: 255 },
+    is_active: { type: Boolean, default: true },
+    gateway_config: { type: mongoose.Schema.Types.Mixed }, // Store gateway-specific configuration
+  },
+  { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
+);
 
-module.exports = mongoose.model('PaymentMethod', paymentMethodSchema);
+module.exports = mongoose.model("PaymentMethod", paymentMethodSchema);

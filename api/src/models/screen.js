@@ -1,13 +1,27 @@
 // models/screen.model.js
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const screenSchema = new mongoose.Schema({
-  name: { type: String, maxlength: 100 },
-  seat_capacity: { type: Number, min: 0 },
-  max_rows: { type: Number, min: 0, required: true, default: 0 },
-  max_columns: { type: Number, min: 0, required: true, default: 0 },
-  theater_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Theater', required: true },
-  is_deleted: { type: Boolean, default: false },
-}, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } });
+const screenSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true, maxlength: 100 },
+    theater_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Theater",
+      required: true,
+    },
+    capacity: { type: Number, min: 1, required: true },
+    screen_type: {
+      type: String,
+      enum: ["STANDARD", "IMAX", "4DX", "VIP"],
+      default: "STANDARD",
+    },
+    is_active: { type: Boolean, default: true },
+  },
+  { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
+);
 
-module.exports = mongoose.model('Screen', screenSchema);
+// Index for better query performance
+screenSchema.index({ theater_id: 1 });
+screenSchema.index({ is_active: 1 });
+
+module.exports = mongoose.model("Screen", screenSchema);

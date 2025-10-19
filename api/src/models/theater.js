@@ -1,20 +1,20 @@
 // models/theater.model.js
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const theaterSchema = new mongoose.Schema({
-  name: { type: String, required: true, maxlength: 100 },
-  location: { type: String, required: true },
-  latitude: { type: Number },
-  longitude: { type: Number },
-  state: { type: String },
-  image: { type: String },
-  phone: {
-    type: String,
-    required: true,
-    match: [/^[0-9]{8,11}$/, 'Phone number must be from 8 to 11 digits'],
-    maxlength: 11
+const theaterSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true, maxlength: 255 },
+    address: { type: String, required: true, maxlength: 500 },
+    city: { type: String, required: true, maxlength: 100 },
+    phone: { type: String, maxlength: 20 },
+    email: { type: String, maxlength: 255 },
+    is_active: { type: Boolean, default: true },
   },
-  is_deleted: { type: Boolean, default: false },
-}, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } });
+  { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
+);
 
-module.exports = mongoose.model('Theater', theaterSchema);
+// Index for better query performance
+theaterSchema.index({ city: 1 });
+theaterSchema.index({ is_active: 1 });
+
+module.exports = mongoose.model("Theater", theaterSchema);
