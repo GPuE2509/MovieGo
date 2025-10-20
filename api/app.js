@@ -22,6 +22,8 @@ const adminNewsRouter = require("./src/routes/admin/news");
 const adminTheaterRouter = require("./src/routes/admin/theater");
 const theaterPublicRouter = require("./src/routes/theaterPublic");
 const movieSelectionPublicRouter = require("./src/routes/movieSelectionPublic");
+const adminCouponRouter = require("./src/routes/admin/coupon");
+const userCouponRouter = require("./src/routes/user/coupon");
 
 const app = express();
 
@@ -58,10 +60,12 @@ app.use("/api/v1/admin", adminTheaterRouter);
 app.use("/api/v1/admin", adminBookingRouter);
 app.use("/api/v1/admin", adminFestivalRouter);
 app.use("/api/v1/admin/users", adminUserManagementRouter);
+app.use("/api/v1/admin", adminCouponRouter);
 app.use("/api/v1/home", homeRouter);
 app.use("/api/v1", homeAliasRouter);
 app.use("/api/v1", theaterPublicRouter);
 app.use("/api/v1", movieSelectionPublicRouter);
+app.use("/api/v1", userCouponRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
