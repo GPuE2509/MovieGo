@@ -23,7 +23,7 @@ const adminNewsRouter = require("./src/routes/admin/news");
 const adminTheaterRouter = require("./src/routes/admin/theater");
 const theaterPublicRouter = require("./src/routes/theaterPublic");
 const movieSelectionPublicRouter = require("./src/routes/movieSelectionPublic");
-
+const adminTicketPriceRouter = require("./src/routes/admin/ticketPrice");
 const app = express();
 
 // CORS configuration
@@ -58,6 +58,7 @@ app.use("/api/v1/admin", adminNewsRouter);
 app.use("/api/v1/admin", adminTheaterRouter);
 app.use("/api/v1/admin", adminBookingRouter);
 app.use("/api/v1/admin", adminFestivalRouter);
+app.use("/api/v1/admin", adminTicketPriceRouter);
 app.use("/api/v1/admin/users", adminUserManagementRouter);
 app.use("/api/v1/user", userProfileRouter);
 app.use("/api/v1/home", homeRouter);
