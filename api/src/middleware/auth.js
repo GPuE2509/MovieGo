@@ -76,8 +76,21 @@ const adminMiddleware = (req, res, next) => {
   }
 };
 
+// Middleware to check if the user has USER role
+const userMiddleware = (req, res, next) => {
+  if (req.user && req.user.role === "ROLE_USER") {
+    next();
+  } else {
+    res.status(403).json({
+      success: false,
+      message: "Access denied. User role required.",
+    });
+  }
+};
+
 module.exports = {
   auth,
   authorize,
   adminMiddleware,
+  userMiddleware,
 };
