@@ -20,6 +20,9 @@ const homeRouter = require("./src/routes/home");
 const homeAliasRouter = require("./src/routes/homeAlias");
 const adminGenreRouter = require("./src/routes/admin/genre");
 const adminNewsRouter = require("./src/routes/admin/news");
+const adminTheaterRouter = require("./src/routes/admin/theater");
+const theaterPublicRouter = require("./src/routes/theaterPublic");
+const movieSelectionPublicRouter = require("./src/routes/movieSelectionPublic");
 
 const app = express();
 
@@ -52,12 +55,15 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/admin", adminMovieRouter);
 app.use("/api/v1/admin", adminGenreRouter);
 app.use("/api/v1/admin", adminNewsRouter);
+app.use("/api/v1/admin", adminTheaterRouter);
 app.use("/api/v1/admin", adminBookingRouter);
 app.use("/api/v1/admin", adminFestivalRouter);
 app.use("/api/v1/admin/users", adminUserManagementRouter);
 app.use("/api/v1/user", userProfileRouter);
 app.use("/api/v1/home", homeRouter);
 app.use("/api/v1", homeAliasRouter);
+app.use("/api/v1", theaterPublicRouter);
+app.use("/api/v1", movieSelectionPublicRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
