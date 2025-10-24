@@ -27,6 +27,7 @@ const adminTicketPriceRouter = require("./src/routes/admin/ticketPrice");
 const adminCouponRouter = require("./src/routes/admin/coupon");
 const adminPromotionRouter = require("./src/routes/admin/promotion");
 const userCouponRouter = require("./src/routes/user/coupon");
+const sidebarManagementRouter = require("./src/routes/sidebarManagement");
 
 const app = express();
 
@@ -72,6 +73,7 @@ app.use("/api/v1", homeAliasRouter);
 app.use("/api/v1", theaterPublicRouter);
 app.use("/api/v1", movieSelectionPublicRouter);
 app.use("/api/v1", userCouponRouter);
+app.use("/api/v1", sidebarManagementRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
