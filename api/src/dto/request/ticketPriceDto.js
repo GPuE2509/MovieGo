@@ -31,8 +31,20 @@ const ticketPriceQueryValidation = [
   query('size').optional().isInt({ min: 1, max: 100 }).toInt(),
 ];
 
+const ticketPricePublicQueryValidation = [
+  query('typeSeat').isIn(SEAT_TYPES).withMessage(`typeSeat must be one of: ${SEAT_TYPES.join(', ')}`),
+  query('typeMovie').isIn(MOVIE_TYPES).withMessage(`typeMovie must be one of: ${MOVIE_TYPES.join(', ')}`),
+];
+
+const applicableTicketPriceQueryValidation = [
+  query('page').optional().isInt({ min: 0 }).toInt(),
+  query('size').optional().isInt({ min: 1, max: 100 }).toInt(),
+];
+
 module.exports = {
   createTicketPriceValidation,
   updateTicketPriceValidation,
   ticketPriceQueryValidation,
+  ticketPricePublicQueryValidation,
+  applicableTicketPriceQueryValidation,
 };
