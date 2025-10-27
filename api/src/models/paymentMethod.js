@@ -8,7 +8,10 @@ const paymentMethodSchema = new mongoose.Schema(
     is_active: { type: Boolean, default: true },
     gateway_config: { type: mongoose.Schema.Types.Mixed }, // Store gateway-specific configuration
   },
-  { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
+  { 
+    timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
+    collection: "paymentmethods" // Explicitly specify collection name
+  }
 );
 
 module.exports = mongoose.model("PaymentMethod", paymentMethodSchema);
