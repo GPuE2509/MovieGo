@@ -25,6 +25,7 @@ const theaterPublicRouter = require("./src/routes/theaterPublic");
 const movieSelectionPublicRouter = require("./src/routes/movieSelectionPublic");
 const adminTicketPriceRouter = require("./src/routes/admin/ticketPrice");
 const adminCouponRouter = require("./src/routes/admin/coupon");
+const adminPromotionRouter = require("./src/routes/admin/promotion");
 const userCouponRouter = require("./src/routes/user/coupon");
 
 const app = express();
@@ -64,6 +65,7 @@ app.use("/api/v1/admin", adminFestivalRouter);
 app.use("/api/v1/admin", adminTicketPriceRouter);
 app.use("/api/v1/admin/users", adminUserManagementRouter);
 app.use("/api/v1/admin", adminCouponRouter);
+app.use("/api/v1/admin", adminPromotionRouter);
 app.use("/api/v1/user", userProfileRouter);
 app.use("/api/v1/home", homeRouter);
 app.use("/api/v1", homeAliasRouter);
