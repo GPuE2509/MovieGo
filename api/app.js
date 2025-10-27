@@ -31,6 +31,7 @@ const sidebarManagementRouter = require("./src/routes/sidebarManagement");
 const ticketPricePublicRouter = require("./src/routes/ticketPricePublic");
 const adminPaymentManagementRouter = require("./src/routes/admin/paymentManagement");
 const adminStatisticsRouter = require("./src/routes/admin/statistics");
+const adminBannerRouter = require("./src/routes/admin/banner");
 
 const app = express();
 
@@ -72,6 +73,7 @@ app.use("/api/v1/admin", adminCouponRouter);
 app.use("/api/v1/admin", adminPromotionRouter);
 app.use("/api/v1/admin", adminPaymentManagementRouter);
 app.use("/api/v1/admin", adminStatisticsRouter);
+app.use("/api/v1/admin", adminBannerRouter);
 app.use("/api/v1/user", userProfileRouter);
 app.use("/api/v1/home", homeRouter);
 app.use("/api/v1", homeAliasRouter);
