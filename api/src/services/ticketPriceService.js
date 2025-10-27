@@ -65,8 +65,25 @@ class TicketPriceService {
   }
 
   async getPriceBySeatAndMovieType(typeSeat, typeMovie, refDate = new Date()) {
+    // Validate input parameters
+    if (!typeSeat || !typeMovie) {
+      throw new Error('seat_type and movie_type are required');
+    }
+    
+    const validSeatTypes = ['STANDARD', 'VIP', 'SWEETBOX'];
+    const validMovieTypes = ['2D', '3D', '4DX', 'IMAX'];
+    
+    if (!validSeatTypes.includes(typeSeat)) {
+      throw new Error(`Invalid seat type. Must be one of: ${validSeatTypes.join(', ')}`);
+    }
+    
+    if (!validMovieTypes.includes(typeMovie)) {
+      throw new Error(`Invalid movie type. Must be one of: ${validMovieTypes.join(', ')}`);
+    }
+    
     const nowHMS = timeToHMS(refDate);
     const isWeekend = isWeekendByDate(refDate);
+    
     // Filter by window: start_time <= now <= end_time (simple within-day window)
     const candidates = await TicketPrice.find({
       seat_type: typeSeat,
@@ -74,6 +91,11 @@ class TicketPriceService {
       day_type: isWeekend,
       is_active: true,
     });
+    
+    if (candidates.length === 0) {
+      throw new Error('No ticket prices found for the given seat type and movie type');
+    }
+    
     const nowSec = toSec(nowHMS);
     const matched = candidates.find(tp => {
       const startSec = toSec(tp.start_time);
@@ -84,13 +106,28 @@ class TicketPriceService {
       // Overnight window (e.g., 22:00:00 - 02:00:00)
       return nowSec >= startSec || nowSec <= endSec;
     });
-    if (!matched) throw new Error('Ticket price not found for given type and time');
+    
+    if (!matched) {
+      throw new Error('No ticket price found for the current time window');
+    }
+    
     return matched;
   }
 
   async getApplicableTicketPrices(showtimeId, { page = 0, size = 10 }) {
+    // Validate showtimeId
+    if (!showtimeId) {
+      throw new Error('showtimeId is required');
+    }
+    
+    // Validate showtimeId format (should be a valid MongoDB ObjectId)
+    if (!/^[0-9a-fA-F]{24}$/.test(showtimeId)) {
+      throw new Error('Invalid showtimeId format');
+    }
+    
     const show = await ShowTime.findById(showtimeId).populate('movie_id');
     if (!show) throw new Error('Showtime not found');
+    
     const movie = show.movie_id;
     if (!movie) throw new Error('Movie not found for showtime');
 
@@ -117,8 +154,8 @@ class TicketPriceService {
 
     return {
       content: filtered,
-      totalElements: total,
-      totalPages: Math.ceil(total / sizeNum),
+      totalElements: filtered.length,
+      totalPages: Math.ceil(filtered.length / sizeNum),
       size: sizeNum,
       number: pageNum,
     };
