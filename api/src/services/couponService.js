@@ -1,8 +1,29 @@
 const Coupon = require('../models/coupon');
 
 class CouponService {
-  async list() {
-    return Coupon.find({}).sort({ created_at: -1 }).lean();
+  async list({ page = 0, pageSize = 10, sortField = 'coupon_name', sortOrder = 'asc', search = '' } = {}) {
+    const filter = search
+      ? { $or: [
+          { coupon_name: { $regex: search, $options: 'i' } },
+          { coupon_code: { $regex: search, $options: 'i' } },
+        ] }
+      : {};
+    const sort = { [sortField]: sortOrder === 'desc' ? -1 : 1 };
+    const skip = Number(page) * Number(pageSize);
+    const limit = Number(pageSize);
+
+    const [items, total] = await Promise.all([
+      Coupon.find(filter).sort(sort).skip(skip).limit(limit).lean(),
+      Coupon.countDocuments(filter),
+    ]);
+
+    return {
+      content: items,
+      totalElements: total,
+      totalPages: Math.ceil(total / (limit || 1)),
+      page: Number(page),
+      pageSize: Number(pageSize),
+    };
   }
 
   async getById(id) {
