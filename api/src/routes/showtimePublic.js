@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const showtimeController = require('../controllers/showtimeController');
+const seatSelectionController = require('../controllers/seatSelectionController');
 const { auth, adminMiddleware } = require('../middleware/auth');
 
 // GET /api/v1/movie/:movieId
@@ -17,6 +18,9 @@ router.get('/showtime/:id', auth, (req, res) => showtimeController.getShowtimeBy
 
 // GET /api/v1/showtimes/:showtimeId/seats
 router.get('/showtimes/:showtimeId/seats', (req, res) => showtimeController.getSeatsByShowtimeId(req, res));
+
+// GET /api/v1/seat/showtime/:showtimeId (grouped by row for selection)
+router.get('/seat/showtime/:showtimeId', (req, res) => seatSelectionController.getSeatStatus(req, res));
 
 // GET /api/v1/showtime/movie/:movieId/theater/:theaterId?date=YYYY-MM-DD
 router.get('/showtime/movie/:movieId/theater/:theaterId', (req, res) => showtimeController.getShowtimesByMovieAndTheater(req, res));

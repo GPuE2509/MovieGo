@@ -117,6 +117,54 @@ async function getAdminSeatStatusByShowtimeAndTheater(showtimeId, theaterId) {
   return rows;
 }
 
+async function getSeatStatusByShowtimeAndTheater(showtimeId, theaterId) {
+  const showtime = await ShowTime.findById(showtimeId).lean();
+  if (!showtime) throw new Error("Showtime not found");
+
+  const screen = await Screen.findById(showtime.screen_id).lean();
+  if (!screen) throw new Error("Screen not found");
+  if (theaterId && String(screen.theater_id) !== String(theaterId)) {
+    // proceed even if mismatch
+  }
+
+  // Exclude deleted seats for public selection
+  const seats = await Seat.find({ screen_id: screen._id, $or: [{ is_deleted: false }, { is_deleted: { $exists: false } }] }).lean();
+
+  const bookings = await Booking.find({
+    showtime_id: showtime._id,
+    status: { $in: ["PENDING", "CONFIRMED", "COMPLETED"] },
+  })
+    .select("_id")
+    .lean();
+  const bookingIds = bookings.map((b) => b._id);
+
+  let bookedSeatIds = new Set();
+  if (bookingIds.length) {
+    const bookingSeats = await BookingSeat.find({ booking_id: { $in: bookingIds } })
+      .select("seat_id")
+      .lean();
+    bookedSeatIds = new Set(bookingSeats.map((bs) => String(bs.seat_id)));
+  }
+
+  const rowMap = new Map();
+  for (const s of seats) {
+    const rowKey = s.row;
+    if (!rowMap.has(rowKey)) rowMap.set(rowKey, []);
+    rowMap.get(rowKey).push({
+      id: s._id,
+      seat_number: s.seat_number,
+      row: s.row,
+      column: s.column,
+      type: s.type,
+      status: bookedSeatIds.has(String(s._id)) ? "BOOKED" : "AVAILABLE",
+    });
+  }
+
+  return [...rowMap.entries()]
+    .map(([row, seatsInRow]) => ({ row, seats: seatsInRow.sort((a, b) => a.column - b.column) }))
+    .sort((a, b) => a.row.localeCompare(b.row));
+}
+
 module.exports = {
   listSeats,
   createSeat,
@@ -125,6 +173,7 @@ module.exports = {
   restoreSeat,
   getDeletedSeats,
   getAdminSeatStatusByShowtimeAndTheater,
+  getSeatStatusByShowtimeAndTheater,
 };
 
 
