@@ -17,11 +17,14 @@ const screenSchema = new mongoose.Schema(
     },
     is_active: { type: Boolean, default: true },
   },
-  { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
+  { 
+    timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
+    collection: "screens"
+  }
 );
 
 // Index for better query performance
 screenSchema.index({ theater_id: 1 });
 screenSchema.index({ is_active: 1 });
 
-module.exports = mongoose.model("Screen", screenSchema);
+module.exports = mongoose.model("Screen", screenSchema, "screens");
