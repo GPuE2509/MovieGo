@@ -1,6 +1,7 @@
 const User = require('../models/user');
 const Role = require('../models/role');
 const { generateToken } = require('../config/jwt');
+const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 
@@ -164,7 +165,7 @@ class AuthService {
     }
   }
 
-  // Forgot password
+  // Forgot password (OTP-centric like Java)
   async forgotPassword(email) {
     try {
       const user = await User.findOne({ email });
@@ -172,32 +173,47 @@ class AuthService {
         throw new Error('User not found');
       }
 
-      // Generate reset token
-      const resetToken = crypto.randomBytes(32).toString('hex');
-      user.resetPasswordToken = resetToken;
-      user.resetPasswordExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+      // Generate 6-digit OTP
+      const otp = (Math.floor(100000 + Math.random() * 900000)).toString();
+      user.otp = otp;
+      user.otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+      // Clear any previous reset state
+      user.resetPasswordToken = null;
+      user.resetPasswordExpires = null;
       await user.save();
 
-      // Send email with reset token
-      await this.sendResetPasswordEmail(email, resetToken);
+      // Send email with OTP
+      await this.sendOTPEmail(email, otp);
 
-      return { message: 'Password reset OTP has been sent to your email', token: resetToken };
+      // Issue a short-lived bearer token for password reset flow (10 minutes)
+      const resetBearer = jwt.sign(
+        { id: user._id, purpose: 'password_reset' },
+        process.env.JWT_SECRET,
+        { expiresIn: '10m' }
+      );
+
+      return { message: 'Password reset OTP has been sent to your email', token: resetBearer };
     } catch (error) {
       throw error;
     }
   }
 
-  // Verify OTP
-  async verifyOTP(otp) {
+  // Verify OTP (must be authenticated in Node, like Java)
+  async verifyOTP(userId, otp) {
     try {
-      const user = await User.findOne({
-        otp: otp,
-        otpExpires: { $gt: new Date() }
-      });
+      const user = await User.findById(userId);
+      if (!user) throw new Error('User not found');
 
-      if (!user) {
+      if (!user.otp || !user.otpExpires || user.otp !== otp || user.otpExpires <= new Date()) {
         throw new Error('Invalid or expired OTP');
       }
+
+      // Mark OTP verified by opening a short reset window
+      user.otp = null;
+      user.otpExpires = null;
+      user.resetPasswordToken = 'OTP_VERIFIED';
+      user.resetPasswordExpires = new Date(Date.now() + 10 * 60 * 1000);
+      await user.save();
 
       return { message: 'OTP verified successfully' };
     } catch (error) {
@@ -205,16 +221,14 @@ class AuthService {
     }
   }
 
-  // Reset password
-  async resetPassword(newPassword, token) {
+  // Reset password (after OTP verification; must be authenticated)
+  async resetPassword(userId, newPassword) {
     try {
-      const user = await User.findOne({
-        resetPasswordToken: token,
-        resetPasswordExpires: { $gt: new Date() }
-      });
+      const user = await User.findById(userId);
+      if (!user) throw new Error('User not found');
 
-      if (!user) {
-        throw new Error('Invalid or expired token');
+      if (user.resetPasswordToken !== 'OTP_VERIFIED' || !user.resetPasswordExpires || user.resetPasswordExpires <= new Date()) {
+        throw new Error('Reset window expired or not verified');
       }
 
       user.password = newPassword;
@@ -251,6 +265,37 @@ class AuthService {
           <p><strong>Token: ${token}</strong></p>
           <p>This token will expire in 10 minutes.</p>
           <p>If you did not request this, please ignore this email.</p>
+        `
+      };
+
+      await transporter.sendMail(mailOptions);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Send OTP email
+  async sendOTPEmail(email, otp) {
+    try {
+      const transporter = nodemailer.createTransport({
+        host: process.env.EMAIL_HOST,
+        port: process.env.EMAIL_PORT,
+        secure: false,
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS
+        }
+      });
+
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: 'OTP Reset Password - Movie Booking',
+        html: `
+          <h2>OTP Verification</h2>
+          <p>Your OTP code is:</p>
+          <p style="font-size:20px"><strong>${otp}</strong></p>
+          <p>This OTP will expire in 10 minutes.</p>
         `
       };
 
