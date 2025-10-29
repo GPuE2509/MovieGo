@@ -135,7 +135,8 @@ class AuthController {
       }
 
       const { otp } = req.body;
-      const result = await authService.verifyOTP(otp);
+      const userId = req.user?.id;
+      const result = await authService.verifyOTP(userId, otp);
 
       res.status(200).json({
         success: true,
@@ -162,8 +163,9 @@ class AuthController {
         });
       }
 
-      const { newPassword, token } = req.body;
-      const result = await authService.resetPassword(newPassword, token);
+      const { newPassword } = req.body;
+      const userId = req.user?.id;
+      const result = await authService.resetPassword(userId, newPassword);
 
       res.status(200).json({
         success: true,
