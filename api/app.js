@@ -16,6 +16,7 @@ const adminBookingRouter = require("./src/routes/admin/booking");
 const adminFestivalRouter = require("./src/routes/admin/festival");
 const adminUserManagementRouter = require("./src/routes/admin/userManagement");
 const userProfileRouter = require("./src/routes/user/profile");
+const userBookingRouter = require("./src/routes/user/booking");
 const homeRouter = require("./src/routes/home");
 const homeAliasRouter = require("./src/routes/homeAlias");
 const adminGenreRouter = require("./src/routes/admin/genre");
@@ -37,6 +38,7 @@ const recommendationsRouter = require("./src/routes/recommendations");
 const adminSeatRouter = require("./src/routes/admin/seat");
 const showtimePublicRouter = require("./src/routes/showtimePublic");
 const adminShowtimeRouter = require("./src/routes/admin/showtime");
+const paymentsRouter = require("./src/routes/payments");
 
 const app = express();
 
@@ -82,6 +84,7 @@ app.use("/api/v1/admin", adminStatisticsRouter);
 app.use("/api/v1/admin", adminBannerRouter);
 app.use("/api/v1/admin", adminSeatRouter);
 app.use("/api/v1/user", userProfileRouter);
+app.use("/api/v1/user/bookings", userBookingRouter);
 app.use("/api/v1/home", homeRouter);
 app.use("/api/v1", homeAliasRouter);
 app.use("/api/v1", theaterPublicRouter);
@@ -92,6 +95,7 @@ app.use("/api/v1", ticketPricePublicRouter);
 app.use("/api/v1", recommendationsRouter);
 app.use("/api/v1", showtimePublicRouter);
 app.use("/api/v1/admin", adminShowtimeRouter);
+app.use("/api/v1/payments", paymentsRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -100,13 +104,21 @@ app.use(function (req, res, next) {
 
 // error handler
 app.use(function (err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get("env") === "development" ? err : {};
+  // We are building a REST API, so we send back JSON for errors.
+  const statusCode = err.status || 500;
+  let statusMessage = "INTERNAL_SERVER_ERROR";
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render("error");
+  if (statusCode === 404) {
+    statusMessage = "NOT_FOUND";
+  } else if (statusCode >= 400 && statusCode < 500) {
+    statusMessage = "BAD_REQUEST";
+  }
+
+  res.status(statusCode).json({
+    status: statusMessage,
+    code: statusCode,
+    data: err.message,
+  });
 });
 
 module.exports = app;

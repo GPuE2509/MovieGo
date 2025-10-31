@@ -26,8 +26,8 @@ const addPaymentMethodValidation = [
   
   body('gateway_config.gateway_type')
     .optional()
-    .isIn(['VNPAY', 'PAYPAL', 'MOMO', 'CUSTOM'])
-    .withMessage('Gateway type must be one of: VNPAY, PAYPAL, MOMO, CUSTOM'),
+    .isIn(['VNPAY', 'MOMO', 'CUSTOM'])
+    .withMessage('Gateway type must be one of: VNPAY, MOMO, CUSTOM'),
   
   body('gateway_config.tmn_code')
     .optional()
@@ -90,8 +90,8 @@ const updatePaymentMethodValidation = [
   
   body('gateway_config.gateway_type')
     .optional()
-    .isIn(['VNPAY', 'PAYPAL', 'MOMO', 'CUSTOM'])
-    .withMessage('Gateway type must be one of: VNPAY, PAYPAL, MOMO, CUSTOM'),
+    .isIn(['VNPAY', 'MOMO', 'CUSTOM'])
+    .withMessage('Gateway type must be one of: VNPAY, MOMO, CUSTOM'),
   
   body('gateway_config.tmn_code')
     .optional()
