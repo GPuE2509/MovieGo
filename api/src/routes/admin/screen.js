@@ -6,11 +6,10 @@ const {
   screenQueryValidation,
   createScreenValidation,
   updateScreenValidation,
-  updateScreenStatusValidation,
   screenIdValidation,
 } = require("../../dto/request/screenDto");
 
-// Get all screens (admin) - with pagination, search and filters
+// Get all screens (admin) - with pagination and search
 router.get(
   "/screens",
   auth,
@@ -26,6 +25,15 @@ router.get(
   adminMiddleware,
   screenIdValidation,
   screenManagementController.getScreenById
+);
+
+// Get screens by Theater ID (admin)
+router.get(
+  "/screens/by-theater/:id",
+  auth,
+  adminMiddleware,
+  screenIdValidation, // Re-using screenIdValidation as it checks for a valid MongoID in params
+  screenManagementController.getScreenByTheaterId
 );
 
 // Create new screen (admin)
@@ -46,15 +54,6 @@ router.put(
   screenManagementController.updateScreen
 );
 
-// Update screen status (admin)
-router.patch(
-  "/screen/update/status/:id",
-  auth,
-  adminMiddleware,
-  updateScreenStatusValidation,
-  screenManagementController.updateScreenStatus
-);
-
 // Delete screen (admin)
 router.delete(
   "/screen/delete/:id",
@@ -62,6 +61,22 @@ router.delete(
   adminMiddleware,
   screenIdValidation,
   screenManagementController.deleteScreen
+);
+
+// Suggest max columns
+router.get(
+  "/screens/suggest-columns",
+  auth,
+  adminMiddleware,
+  screenManagementController.suggestColumns
+);
+
+// Suggest max rows
+router.get(
+  "/screens/suggest-rows",
+  auth,
+  adminMiddleware,
+  screenManagementController.suggestRows
 );
 
 module.exports = router;
