@@ -161,11 +161,6 @@ class PaymentManagementService {
             throw new Error('VNPay configuration requires tmn_code and hash_secret');
           }
           break;
-        case 'paypal':
-          if (!gatewayConfig.client_id || !gatewayConfig.client_secret) {
-            throw new Error('PayPal configuration requires client_id and client_secret');
-          }
-          break;
         case 'momo':
           if (!gatewayConfig.partner_code || !gatewayConfig.access_key || !gatewayConfig.secret_key) {
             throw new Error('MoMo configuration requires partner_code, access_key, and secret_key');
