@@ -10,6 +10,48 @@ const Screen = require("../models/screen");
 const TicketPrice = require("../models/ticketPrice");
 const Coupon = require("../models/coupon");
 
+function isWeekend(date) {
+  const d = new Date(date);
+  const day = d.getDay(); // 0 Sun .. 6 Sat
+  return day === 0 || day === 6;
+}
+function isHoliday(/* date */) {
+  // Extend when holiday rules available
+  return false;
+}
+function toHHMMSS(date) {
+  // Use the time component of showtimeStart as provided (UTC-based fields end with Z)
+  const d = new Date(date);
+  const h = String(d.getUTCHours()).padStart(2, "0");
+  const m = String(d.getUTCMinutes()).padStart(2, "0");
+  const s = String(d.getUTCSeconds()).padStart(2, "0");
+  return `${h}:${m}:${s}`;
+}
+function timeToMinutes(t) {
+  const [h, m, s] = String(t).split(":").map(Number);
+  return h * 60 + m + (s ? s / 60 : 0);
+}
+async function findTicketPriceForShowtime({ seatType, movieType, showtimeStart }) {
+  const dayType = isWeekend(showtimeStart) || isHoliday(showtimeStart);
+  const timeStr = toHHMMSS(showtimeStart);
+  const all = await TicketPrice.find({
+    seat_type: seatType,
+    movie_type: movieType,
+    day_type: dayType,
+    is_active: true,
+  }).lean();
+  const targetMin = timeToMinutes(timeStr);
+  for (const tp of all) {
+    const startMin = timeToMinutes(tp.start_time);
+    const endMin = timeToMinutes(tp.end_time);
+    const inRange = startMin <= targetMin && targetMin < endMin;
+    if (inRange) {
+      return tp.price;
+    }
+  }
+  throw new Error("Ticket price not found");
+}
+
 class BookingService {
   // Get all bookings with pagination and search (Admin)
   async getAllBookings(search, page, size, sortBy, direction) {
@@ -112,7 +154,25 @@ class BookingService {
       if (taken.length) throw new Error("Some seats are already booked");
     }
 
-    const total_price_movie = (showtime.price || 0) * seats.length;
+    // Calculate price like BE
+    const movie = await Movie.findById(showtime.movie_id).lean();
+    let total_price_movie = 0;
+    for (const seat of seats) {
+      const basePrice = await findTicketPriceForShowtime({
+        seatType: seat.type,
+        movieType: movie.type,
+        showtimeStart: showtime.start_time,
+      });
+      let finalPrice = basePrice;
+      if (isHoliday(showtime.start_time)) {
+        finalPrice = basePrice; // extend when holiday rules exist
+      }
+      if (Number(movie.duration) > 150) {
+        finalPrice += 10000;
+      }
+      total_price_movie += finalPrice;
+    }
+
     const booking = await Booking.create({
       user_id: userId,
       showtime_id,
@@ -210,7 +270,25 @@ class BookingService {
       if (taken.length) throw new Error("Some seats are already booked");
     }
 
-    const total_price_movie = (showtime.price || 0) * seats.length;
+    // Calculate price like BE
+    const movie = await Movie.findById(showtime.movie_id).lean();
+    let total_price_movie = 0;
+    for (const seat of seats) {
+      const basePrice = await findTicketPriceForShowtime({
+        seatType: seat.type,
+        movieType: movie.type,
+        showtimeStart: showtime.start_time,
+      });
+      let finalPrice = basePrice;
+      if (isHoliday(showtime.start_time)) {
+        finalPrice = basePrice;
+      }
+      if (Number(movie.duration) > 150) {
+        finalPrice += 10000;
+      }
+      total_price_movie += finalPrice;
+    }
+
     const booking = await Booking.create({
       user_id: (httpRequest && httpRequest.user && httpRequest.user.id) ? httpRequest.user.id : null,
       showtime_id: showtimeId,
@@ -235,8 +313,6 @@ class BookingService {
       booking.user_id = userId;
     }
 
-    console.log(booking.user_id, userId);
-
     if (String(booking.user_id) !== String(userId)) throw new Error("Unauthorized");
 
     // Only allow payment when booking is PENDING
@@ -247,26 +323,31 @@ class BookingService {
     // Validate payment method
     if (!paymentMethodId) throw new Error("paymentMethodId is required");
     const PaymentMethod = require("../models/paymentMethod");
-    const methodExists = await PaymentMethod.exists({ _id: paymentMethodId, is_active: true });
-    if (!methodExists) throw new Error("Payment method not found or inactive");
+    const method = await PaymentMethod.findById(paymentMethodId).lean();
+    if (!method || method.is_active === false) throw new Error("Payment method not found or inactive");
 
     // Generate transaction id
     const transactionId = "TX" + Date.now() + Math.random().toString(36).slice(2, 7).toUpperCase();
 
+    // Create a pending payment record
     const payment = await Payment.create({
       booking_id: bookingId,
       payment_method_id: paymentMethodId,
       transaction_id: transactionId,
       amount: booking.total_price_movie,
-      payment_status: "COMPLETED",
-      payment_time: new Date(),
+      payment_status: "PENDING",
+      payment_time: null,
     });
 
     booking.payment_id = payment._id;
-    booking.status = "COMPLETED";
     await booking.save();
 
-    return { booking_id: bookingId, payment_id: payment._id, transaction_id: transactionId, status: "COMPLETED" };
+    // Build payment URL via gateway
+    const paymentGatewayRegistry = require("./paymentGatewayRegistry");
+    const gateway = paymentGatewayRegistry.get(method.code || method.name);
+    const paymentUrl = await gateway.createPaymentUrl(booking.toObject ? booking.toObject() : booking, transactionId, httpRequest);
+
+    return { paymentUrl };
   }
 
   // Get booking by ID (Admin)

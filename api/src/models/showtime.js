@@ -15,7 +15,6 @@ const showtimeSchema = new mongoose.Schema(
     },
     start_time: { type: Date, required: true },
     end_time: { type: Date, required: true },
-    price: { type: Number, min: 0, required: true },
     is_active: { type: Boolean, default: true },
   },
   { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
