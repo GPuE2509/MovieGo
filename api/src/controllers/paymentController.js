@@ -17,7 +17,10 @@ class PaymentController {
   async vnpayReturn(req, res) {
     try {
       const gateway = paymentGatewayRegistry.get("VNPAY");
-      const result = await gateway.handleCallback(req.query);
+      // Extract raw query string from URL (before Express decoding)
+      // VNPay calculates hash from raw query string with original encoding
+      const rawQueryString = req.originalUrl?.split('?')[1] || req.url?.split('?')[1] || null;
+      const result = await gateway.handleCallback(req.query, rawQueryString);
       const payment = await Payment.findOne({ transaction_id: result.transactionId });
       if (!payment) throw new Error("Payment not found");
       payment.payment_status = result.status;
@@ -41,7 +44,15 @@ class PaymentController {
       const gateway = paymentGatewayRegistry.get("VNPAY");
       // Get params from either query (GET) or body (POST)
       const params = Object.keys(req.query).length > 0 ? req.query : (req.body || {});
-      const result = await gateway.handleCallback(params);
+      // Extract raw query string from URL (for GET) or raw body (for POST)
+      let rawQueryString = null;
+      if (Object.keys(req.query).length > 0) {
+        rawQueryString = req.originalUrl?.split('?')[1] || req.url?.split('?')[1] || null;
+      } else if (req.body && typeof req.body === 'string') {
+        // POST with raw body (query string format)
+        rawQueryString = req.body;
+      }
+      const result = await gateway.handleCallback(params, rawQueryString);
       const payment = await Payment.findOne({ transaction_id: result.transactionId });
       if (!payment) {
         // Return error code to VNPay

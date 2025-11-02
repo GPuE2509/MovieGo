@@ -1,64 +1,44 @@
-const crypto = require("crypto");
+const { VNPay, ignoreLogger, ProductCode, VnpLocale, dateFormat, verifySecureHash } = require("vnpay");
 
-function hmacSHA512(secret, data) {
-  if (!secret) {
-    throw new Error("VNP_HASH_SECRET is not configured");
+// Get VNPay instance (singleton pattern)
+let vnpayInstance = null;
+
+function getVNPayInstance() {
+  if (!vnpayInstance) {
+    const vnp_TmnCode = (process.env.VNP_TMN_CODE || "").trim();
+    const vnp_HashSecret = (process.env.VNP_HASH_SECRET || "").trim();
+    const vnp_PayUrl = (process.env.VNP_PAY_URL || "").trim();
+    const vnp_ReturnUrl = (process.env.VNP_RETURN_URL || "").trim();
+
+    if (!vnp_TmnCode || !vnp_HashSecret || !vnp_ReturnUrl) {
+      throw new Error("VNPay configuration is missing. Please check VNP_TMN_CODE, VNP_HASH_SECRET, VNP_RETURN_URL");
+    }
+
+    // Extract payment host from pay URL or use default
+    let paymentHost = "https://sandbox.vnpayment.vn";
+    if (vnp_PayUrl) {
+      try {
+        const url = new URL(vnp_PayUrl);
+        paymentHost = `${url.protocol}//${url.host}`;
+      } catch (e) {
+        // Keep default if URL parsing fails
+      }
+    }
+
+    vnpayInstance = new VNPay({
+      tmnCode: vnp_TmnCode,
+      secureSecret: vnp_HashSecret,
+      paymentHost: paymentHost,
+      testMode: paymentHost.includes("sandbox") || paymentHost.includes("test"),
+      hashAlgorithm: "SHA512",
+      loggerFn: ignoreLogger,
+    });
   }
-  return crypto.createHmac("sha512", secret).update(data, "utf8").digest("hex");
+  return vnpayInstance;
 }
 
-function formatDateYmdHmsICT(date = new Date()) {
-  // Format date in Asia/Ho_Chi_Minh timezone (UTC+7)
-  // VNPay requires: yyyyMMddHHmmss format in ICT timezone
-  // Convert UTC to ICT: add 7 hours
-  const ictOffset = 7 * 60 * 60 * 1000;
-  const ictTime = date.getTime() + ictOffset;
-  const ictDate = new Date(ictTime);
-  
-  // Use UTC methods after offset adjustment
-  const year = ictDate.getUTCFullYear();
-  const month = String(ictDate.getUTCMonth() + 1).padStart(2, "0");
-  const day = String(ictDate.getUTCDate()).padStart(2, "0");
-  const hour = String(ictDate.getUTCHours()).padStart(2, "0");
-  const minute = String(ictDate.getUTCMinutes()).padStart(2, "0");
-  const second = String(ictDate.getUTCSeconds()).padStart(2, "0");
-  
-  return `${year}${month}${day}${hour}${minute}${second}`;
-}
-
-function buildQuery(params) {
-  // Use TreeMap-like behavior: sort keys alphabetically
-  const sortedKeys = Object.keys(params)
-    .filter((k) => {
-      const value = params[k];
-      return value !== undefined && value !== null && value !== "";
-    })
-    .sort();
-  
-  const queryParts = [];
-  for (const key of sortedKeys) {
-    const encodedKey = encodeURIComponent(key);
-    const encodedValue = encodeURIComponent(String(params[key]));
-    queryParts.push(`${encodedKey}=${encodedValue}`);
-  }
-  
-  return queryParts.join("&");
-}
-
-async function createPaymentUrl(booking, transactionId, req) {
-  const vnp_TmnCode = (process.env.VNP_TMN_CODE || "").trim();
-  const vnp_HashSecret = (process.env.VNP_HASH_SECRET || "").trim();
-  const vnp_ReturnUrl = (process.env.VNP_RETURN_URL || "").trim();
-  const vnp_PayUrl = (process.env.VNP_PAY_URL || "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html").trim();
-
-  if (!vnp_TmnCode || !vnp_HashSecret || !vnp_ReturnUrl) {
-    throw new Error("VNPay configuration is missing. Please check VNP_TMN_CODE, VNP_HASH_SECRET, VNP_RETURN_URL");
-  }
-
-  // Calculate amount: total_price_movie * 100 (convert to cents)
-  const amount = Math.round(Number(booking.total_price_movie || booking.totalPriceMovie || 0) * 100);
-  
-  // Get client IP (match Java VnpayConfig.getIpAddress logic)
+// Get client IP (match Java VnpayConfig.getIpAddress logic)
+function getClientIp(req) {
   let clientIp = "127.0.0.1";
   if (req) {
     const xForwardedFor = req.headers["x-forwarded-for"] || req.headers["X-FORWARDED-FOR"];
@@ -72,51 +52,135 @@ async function createPaymentUrl(booking, transactionId, req) {
       clientIp = "127.0.0.1";
     }
   }
+  return clientIp;
+}
 
-  // Format dates in ICT timezone
-  const createDate = formatDateYmdHmsICT(new Date());
-  const expireDate = formatDateYmdHmsICT(new Date(Date.now() + 15 * 60 * 1000)); // +15 minutes
+async function createPaymentUrl(booking, transactionId, req) {
+  const vnpay = getVNPayInstance();
+  const vnp_ReturnUrl = (process.env.VNP_RETURN_URL || "").trim();
 
-  // Build params - use Map-like structure that will be sorted
-  const vnpParams = {};
-  vnpParams["vnp_Version"] = "2.1.0";
-  vnpParams["vnp_Command"] = "pay";
-  vnpParams["vnp_TmnCode"] = vnp_TmnCode;
-  vnpParams["vnp_Amount"] = String(amount);
-  vnpParams["vnp_CurrCode"] = "VND";
-  vnpParams["vnp_TxnRef"] = transactionId;
-  vnpParams["vnp_OrderInfo"] = `Thanh toan don hang: ${booking._id || booking.id}`;
-  vnpParams["vnp_OrderType"] = "other";
-  vnpParams["vnp_Locale"] = "vn";
-  vnpParams["vnp_ReturnUrl"] = vnp_ReturnUrl;
-  vnpParams["vnp_IpAddr"] = clientIp;
-  vnpParams["vnp_CreateDate"] = createDate;
-  vnpParams["vnp_ExpireDate"] = expireDate;
+  // Calculate amount: total_price_movie * 100 (convert to cents)
+  const amount = Math.round(Number(booking.total_price_movie || booking.totalPriceMovie || 0));
 
-  // Build query string (automatically sorted by buildQuery)
-  const queryString = buildQuery(vnpParams);
-  
-  // Calculate HMAC SHA512 hash
-  const vnp_SecureHash = hmacSHA512(vnp_HashSecret, queryString);
-  
-  // Append secure hash to query string
-  const finalQueryString = `${queryString}&vnp_SecureHash=${vnp_SecureHash}`;
-  
-  // Build final payment URL
-  const paymentUrl = `${vnp_PayUrl}?${finalQueryString}`;
-  
+  // Get client IP
+  const clientIp = getClientIp(req);
+
+  // Calculate expire date (15 minutes from now)
+  const expireDate = new Date(Date.now() + 15 * 60 * 1000);
+
+  // Build payment URL using vnpay library
+  // This library handles signature calculation automatically
+  // buildPaymentUrl returns a string (payment URL) directly, not an object
+  const paymentUrl = vnpay.buildPaymentUrl({
+    vnp_Amount: amount,
+    vnp_IpAddr: clientIp,
+    vnp_TxnRef: transactionId,
+    vnp_OrderInfo: `Thanh toan don hang: ${booking._id || booking.id}`,
+    vnp_OrderType: ProductCode.Other,
+    vnp_ReturnUrl: vnp_ReturnUrl,
+    vnp_Locale: VnpLocale.VN,
+    vnp_CreateDate: dateFormat(new Date()),
+    vnp_ExpireDate: dateFormat(expireDate),
+  });
+
   return paymentUrl;
 }
 
-async function handleCallback(params) {
-  const vnp_HashSecret = process.env.VNP_HASH_SECRET;
+async function handleCallback(params, rawQueryString = null) {
+  // Verify signature manually
+  // VNPay requires: hash should be calculated from RAW query string (as sent by VNPay, with original encoding)
+  // If rawQueryString is provided, parse and rebuild from it (preserving encoding)
+  // Otherwise, rebuild from decoded params (may not match VNPay's hash)
+  const vnp_HashSecret = (process.env.VNP_HASH_SECRET || "").trim();
+  if (!vnp_HashSecret) {
+    throw new Error("VNP_HASH_SECRET is not configured");
+  }
+
   const secureHash = params.vnp_SecureHash;
-  if (!secureHash) throw new Error("Missing VNPay secure hash");
-  const cloned = { ...params };
-  delete cloned.vnp_SecureHash;
-  const query = buildQuery(cloned);
-  const calculated = hmacSHA512(vnp_HashSecret, query);
-  if (secureHash !== calculated) throw new Error("Invalid VNPay secure hash");
+  if (!secureHash) {
+    throw new Error("Missing VNPay secure hash");
+  }
+
+  let queryString;
+
+  if (rawQueryString) {
+    // Parse raw query string manually (preserving encoding like + and %3A)
+    // URLSearchParams decodes automatically, so we parse manually
+    const rawParams = {};
+    const parts = rawQueryString.split('&');
+    
+    for (const part of parts) {
+      const equalIndex = part.indexOf('=');
+      if (equalIndex === -1) continue;
+      
+      const key = part.substring(0, equalIndex);
+      const value = part.substring(equalIndex + 1);
+      
+      // Decode key only (to normalize), but keep value as-is (preserving encoding)
+      const decodedKey = decodeURIComponent(key);
+      
+      if (decodedKey !== "vnp_SecureHash" && decodedKey !== "vnp_SecureHashType") {
+        // Store with decoded key but raw value (preserving encoding)
+        rawParams[decodedKey] = value; // Keep original encoding in value
+      }
+    }
+
+    // Sort keys alphabetically and rebuild query string
+    const sortedKeys = Object.keys(rawParams).sort();
+    const queryParts = [];
+    for (const key of sortedKeys) {
+      const rawValue = rawParams[key];
+      if (rawValue !== null && rawValue !== undefined && rawValue !== "") {
+        // Use raw value (preserving encoding like + and %3A)
+        // Note: key is decoded but we need to re-encode it, value stays raw
+        queryParts.push(`${encodeURIComponent(key)}=${rawValue}`);
+      }
+    }
+    queryString = queryParts.join("&");
+  } else {
+    // Fallback: rebuild from decoded params (may not match VNPay's hash)
+    // Remove vnp_SecureHash and vnp_SecureHashType, then sort alphabetically
+    const sortedParams = {};
+    const keys = Object.keys(params).sort(); // Alphabetical order
+    
+    for (const key of keys) {
+      if (key === "vnp_SecureHash" || key === "vnp_SecureHashType") {
+        continue; // Skip these
+      }
+      const value = params[key];
+      if (value !== null && value !== undefined && value !== "") {
+        sortedParams[key] = value;
+      }
+    }
+
+    // Build query string WITHOUT encoding (raw values)
+    const queryParts = [];
+    for (const key of Object.keys(sortedParams)) {
+      const value = sortedParams[key];
+      // NO encoding - use raw values for signature verification
+      queryParts.push(`${key}=${String(value)}`);
+    }
+    queryString = queryParts.join("&");
+  }
+
+  // Calculate hash using HMAC SHA512 (match Java HMACUtil.HMacHexStringEncode)
+  const crypto = require("crypto");
+  const calculatedHash = crypto
+    .createHmac("sha512", vnp_HashSecret)
+    .update(queryString, "utf8")
+    .digest("hex");
+
+  // Compare hashes
+  if (secureHash !== calculatedHash) {
+    console.error("VNPay signature verification failed:", {
+      transactionId: params.vnp_TxnRef,
+      receivedHash: secureHash,
+      calculatedHash: calculatedHash,
+      queryString: queryString,
+      params: Object.keys(params),
+    });
+    throw new Error("Invalid VNPay secure hash");
+  }
 
   const transactionId = params.vnp_TxnRef;
   const responseCode = params.vnp_ResponseCode;
