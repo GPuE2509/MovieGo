@@ -1,6 +1,20 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Keyboard, Alert, ActivityIndicator } from 'react-native';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  TextInput, 
+  TouchableOpacity, 
+  Keyboard, 
+  Alert, 
+  ActivityIndicator, 
+  Dimensions,
+  ScrollView
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+
+const { width } = Dimensions.get('window');
 
 const OtpVerificationScreen = ({ email, onVerifySuccess }) => {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
@@ -103,51 +117,81 @@ const OtpVerificationScreen = ({ email, onVerifySuccess }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.innerContainer}>
-        <Text style={styles.title}>Xác thực OTP</Text>
-        <Text style={styles.subtitle}>
-          Mã xác nhận đã được gửi đến
-        </Text>
-        <Text style={styles.emailText}>{email}</Text>
-        
-        {error ? <Text style={styles.error}>{error}</Text> : null}
-        
-        <View style={styles.otpContainer}>
-          {[0, 1, 2, 3, 4, 5].map((index) => (
-            <TextInput
-              key={index}
-              ref={(ref) => (otpInputs.current[index] = ref)}
-              style={[styles.otpInput, otp[index] ? styles.otpInputFilled : null]}
-              value={otp[index]}
-              onChangeText={(text) => handleOtpChange(index, text)}
-              onKeyPress={({ nativeEvent }) => handleKeyPress(index, nativeEvent.key)}
-              keyboardType="number-pad"
-              maxLength={1}
-              selectTextOnFocus
-              editable={!loading}
-              selectionColor="#1a73e8"
-            />
-          ))}
+      <LinearGradient
+        colors={['#b91c1c', '#991b1b']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.header}
+      >
+        <View style={styles.headerContent}>
+          <TouchableOpacity 
+            style={styles.backButton} 
+            onPress={() => navigation.goBack()}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="arrow-back" size={24} color="#fff" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Xác thực OTP</Text>
+          <View style={{ width: 24 }} />
         </View>
-        
-        <TouchableOpacity 
-          style={[styles.resendButton, resendDisabled && styles.resendButtonDisabled]} 
-          onPress={handleResendOtp}
-          disabled={resendDisabled || loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="#1a73e8" />
-          ) : (
-            <Text style={styles.resendButtonText}>
-              {resendDisabled ? `Gửi lại sau (${countdown}s)` : 'Gửi lại mã OTP'}
-            </Text>
-          )}
-        </TouchableOpacity>
-        
-        <Text style={styles.note}>
-          Nếu không nhận được mã, vui lòng kiểm tra thư mục thư rác hoặc nhấn "Gửi lại mã OTP"
-        </Text>
-      </View>
+      </LinearGradient>
+
+      <ScrollView 
+        contentContainerStyle={styles.scrollContainer}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.formContainer}>
+          <Text style={styles.subtitle}>
+            Mã xác nhận đã được gửi đến
+          </Text>
+          <Text style={styles.emailText}>{email}</Text>
+          
+          {error ? (
+            <View style={styles.errorContainer}>
+              <Text style={styles.error}>❌ {error}</Text>
+            </View>
+          ) : null}
+          
+          <View style={styles.otpContainer}>
+            {[0, 1, 2, 3, 4, 5].map((index) => (
+              <TextInput
+                key={index}
+                ref={(ref) => (otpInputs.current[index] = ref)}
+                style={[styles.otpInput, otp[index] ? styles.otpInputFilled : null]}
+                value={otp[index]}
+                onChangeText={(text) => handleOtpChange(index, text)}
+                onKeyPress={({ nativeEvent }) => handleKeyPress(index, nativeEvent.key)}
+                keyboardType="number-pad"
+                maxLength={1}
+                selectTextOnFocus
+                editable={!loading}
+                selectionColor="#b91c1c"
+                placeholder="•"
+                placeholderTextColor="#999"
+              />
+            ))}
+          </View>
+          
+          <TouchableOpacity 
+            style={[styles.resendButton, resendDisabled && styles.resendButtonDisabled]} 
+            onPress={handleResendOtp}
+            disabled={resendDisabled || loading}
+            activeOpacity={0.8}
+          >
+            {loading ? (
+              <ActivityIndicator color="#b91c1c" />
+            ) : (
+              <Text style={styles.resendButtonText}>
+                {resendDisabled ? `Gửi lại sau (${countdown}s)` : 'Gửi lại mã OTP'}
+              </Text>
+            )}
+          </TouchableOpacity>
+          
+          <Text style={styles.note}>
+            Nếu không nhận được mã, vui lòng kiểm tra thư mục thư rác hoặc nhấn "Gửi lại mã OTP"
+          </Text>
+        </View>
+      </ScrollView>
     </View>
   );
 };
@@ -155,19 +199,51 @@ const OtpVerificationScreen = ({ email, onVerifySuccess }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    padding: 20,
+    backgroundColor: '#f8f9fa',
   },
-  innerContainer: {
-    flex: 1,
-    justifyContent: 'center',
+  header: {
+    paddingTop: 50,
+    paddingBottom: 24,
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
-  title: {
-    fontSize: 24,
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+  },
+  headerTitle: {
+    fontSize: 20,
     fontWeight: '700',
-    color: '#333',
+    color: '#fff',
     textAlign: 'center',
-    marginBottom: 8,
+    flex: 1,
+  },
+  backButton: {
+    padding: 8,
+    marginLeft: -8,
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    padding: 20,
+    paddingBottom: 40,
+  },
+  formContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+    marginTop: 20,
   },
   subtitle: {
     fontSize: 16,
@@ -178,7 +254,7 @@ const styles = StyleSheet.create({
   emailText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1a73e8',
+    color: '#b91c1c',
     textAlign: 'center',
     marginBottom: 32,
   },
@@ -192,41 +268,51 @@ const styles = StyleSheet.create({
     height: 56,
     borderWidth: 1,
     borderColor: '#ddd',
-    borderRadius: 8,
+    borderRadius: 12,
     textAlign: 'center',
     fontSize: 20,
     fontWeight: '600',
     color: '#333',
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#f5f5f5',
   },
   otpInputFilled: {
-    borderColor: '#1a73e8',
-    backgroundColor: '#f0f7ff',
-  },
-  error: {
-    color: '#e74c3c',
-    textAlign: 'center',
-    marginBottom: 16,
-    fontSize: 14,
+    borderColor: '#b91c1c',
+    backgroundColor: '#fee2e2',
   },
   resendButton: {
-    alignSelf: 'center',
+    padding: 12,
+    alignItems: 'center',
     marginBottom: 24,
+    borderWidth: 1,
+    borderColor: '#b91c1c',
+    borderRadius: 12,
+    backgroundColor: 'transparent',
   },
   resendButtonDisabled: {
-    opacity: 0.5,
+    borderColor: '#d1d5db',
   },
   resendButtonText: {
-    color: '#1a73e8',
+    color: '#b91c1c',
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   note: {
-    fontSize: 13,
-    color: '#888',
+    fontSize: 12,
+    color: '#666',
     textAlign: 'center',
-    lineHeight: 18,
-    paddingHorizontal: 20,
+    lineHeight: 16,
+    marginBottom: 8,
+  },
+  errorContainer: {
+    backgroundColor: '#fee2e2',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+  },
+  error: {
+    color: '#b91c1c',
+    fontSize: 14,
+    textAlign: 'center',
   },
 });
 

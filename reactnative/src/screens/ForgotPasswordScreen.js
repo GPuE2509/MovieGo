@@ -1,7 +1,21 @@
 import { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, Alert } from 'react-native';
+import { 
+  View, 
+  Text, 
+  TextInput, 
+  StyleSheet, 
+  TouchableOpacity, 
+  KeyboardAvoidingView, 
+  Platform, 
+  ScrollView, 
+  ActivityIndicator,
+  Dimensions
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import OtpVerificationScreen from './OtpVerificationScreen';
+
+const { width } = Dimensions.get('window');
 
 export default function ForgotPasswordScreen({ navigation, route }) {
   const [email, setEmail] = useState(route.params?.email || '');
@@ -41,142 +55,243 @@ export default function ForgotPasswordScreen({ navigation, route }) {
   }
 
   return (
-    <KeyboardAvoidingView 
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
-    >
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.innerContainer}>
-          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-            <Ionicons name="arrow-back" size={24} color="#000" />
+    <View style={styles.container}>
+      <LinearGradient
+        colors={['#b91c1c', '#991b1b']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.header}
+      >
+        <View style={styles.headerContent}>
+          <TouchableOpacity 
+            style={styles.backButton} 
+            onPress={() => navigation.goBack()}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="arrow-back" size={24} color="#fff" />
           </TouchableOpacity>
-          
-          <Text style={styles.title}>Quên mật khẩu</Text>
-          <Text style={styles.subtitle}>
-            Vui lòng nhập địa chỉ email đã đăng ký để nhận mã xác nhận OTP
-          </Text>
-          
-          {error ? <Text style={styles.error}>{error}</Text> : null}
-          {message ? <Text style={styles.message}>{message}</Text> : null}
-          
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Email</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Nhập email của bạn"
-              value={email}
-              onChangeText={setEmail}
-              autoCapitalize="none"
-              keyboardType="email-address"
-              autoFocus
-              editable={!loading}
-            />
-          </View>
-          
-          <View style={styles.buttonContainer}>
-            <Button
-              title={loading ? 'ĐANG XỬ LÝ...' : 'GỬI MÃ XÁC NHẬN'}
+          <Text style={styles.headerTitle}>Quên mật khẩu</Text>
+          <View style={{ width: 24 }} />
+        </View>
+      </LinearGradient>
+
+      <KeyboardAvoidingView 
+        style={styles.content}
+        behavior={Platform.OS === 'ios' ? 'padding' : null}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+      >
+        <ScrollView 
+          contentContainerStyle={styles.scrollContainer}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.formContainer}>
+            <Text style={styles.subtitle}>
+              Vui lòng nhập địa chỉ email đã đăng ký để nhận mã xác nhận OTP
+            </Text>
+            
+            {error ? (
+              <View style={styles.errorContainer}>
+                <Text style={styles.error}>❌ {error}</Text>
+              </View>
+            ) : null}
+            
+            {message ? (
+              <View style={styles.successContainer}>
+                <Text style={styles.message}>✅ {message}</Text>
+              </View>
+            ) : null}
+            
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Email *</Text>
+              <View style={styles.inputWrapper}>
+                <Ionicons name="mail-outline" size={20} color="#666" style={styles.inputIcon} />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Nhập email của bạn"
+                  placeholderTextColor="#999"
+                  value={email}
+                  onChangeText={setEmail}
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                  autoFocus
+                  editable={!loading}
+                />
+              </View>
+            </View>
+            
+            <TouchableOpacity
+              style={[styles.submitButton, loading && styles.submitButtonDisabled]}
               onPress={handleSendOtp}
               disabled={loading}
-              color="#1a73e8"
-            />
-          </View>
-          
-          <View style={styles.loginContainer}>
-            <Text style={styles.loginText}>Nhớ mật khẩu? </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-              <Text style={styles.loginLink}>Đăng nhập ngay</Text>
+              activeOpacity={0.8}
+            >
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.submitButtonText}>GỬI MÃ XÁC NHẬN</Text>
+              )}
             </TouchableOpacity>
+            
+            <View style={styles.loginContainer}>
+              <Text style={styles.loginText}>Nhớ mật khẩu? </Text>
+              <TouchableOpacity 
+                onPress={() => navigation.navigate('Login')}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.loginLink}>Đăng nhập ngay</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-  },
-  scrollContainer: {
-    flexGrow: 1,
-  },
-  innerContainer: {
-    padding: 20,
+    backgroundColor: '#f8f9fa',
   },
   header: {
-    padding: 10,
-    paddingHorizontal: 20,
+    paddingTop: 50,
+    paddingBottom: 24,
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  headerContent: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#fff',
+    textAlign: 'center',
+    flex: 1,
   },
   backButton: {
     padding: 8,
     marginLeft: -8,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    marginBottom: 12,
-    textAlign: 'center',
-    color: '#333',
+  content: {
+    flex: 1,
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    padding: 20,
+    paddingBottom: 40,
+  },
+  formContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+    marginTop: 20,
   },
   subtitle: {
     fontSize: 14,
     color: '#666',
     textAlign: 'center',
-    marginBottom: 32,
-    paddingHorizontal: 20,
+    marginBottom: 24,
     lineHeight: 20,
   },
   inputContainer: {
-    marginBottom: 24,
+    marginBottom: 20,
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    height: 56,
+  },
+  inputIcon: {
+    marginRight: 12,
   },
   label: {
     fontSize: 14,
     color: '#333',
     marginBottom: 8,
-    fontWeight: '500',
+    fontWeight: '600',
+    marginLeft: 4,
   },
   input: {
-    height: 48,
-    borderColor: '#ddd',
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 16,
+    flex: 1,
+    height: '100%',
     fontSize: 16,
-    backgroundColor: '#f9f9f9',
+    color: '#333',
+    paddingVertical: 0,
   },
-  buttonContainer: {
+  submitButton: {
+    backgroundColor: '#b91c1c',
+    borderRadius: 12,
+    height: 56,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 16,
+    shadowColor: '#b91c1c',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  submitButtonDisabled: {
+    backgroundColor: '#d1d5db',
+    shadowColor: 'transparent',
+  },
+  submitButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  errorContainer: {
+    backgroundColor: '#fee2e2',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+  },
+  successContainer: {
+    backgroundColor: '#dcfce7',
+    borderRadius: 8,
+    padding: 12,
     marginBottom: 16,
   },
   error: {
-    color: '#e74c3c',
-    marginBottom: 16,
-    textAlign: 'center',
+    color: '#b91c1c',
     fontSize: 14,
+    textAlign: 'center',
   },
   message: {
-    color: '#2ecc71',
-    marginBottom: 16,
-    textAlign: 'center',
+    color: '#15803d',
     fontSize: 14,
+    textAlign: 'center',
   },
   loginContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 8,
+    marginTop: 24,
   },
   loginText: {
     color: '#666',
     fontSize: 14,
   },
   loginLink: {
-    color: '#1a73e8',
+    color: '#b91c1c',
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: '600',
     marginLeft: 4,
   },
 });
