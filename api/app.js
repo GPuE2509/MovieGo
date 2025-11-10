@@ -49,8 +49,11 @@ app.use(
     origin: [
       "http://localhost:5173",
       "http://localhost:3000",
+      "http://localhost:8081",
       "exp://10.10.5.32:8081",
-      "http://localhost:8081"
+      "exp://10.10.7.126:8081",
+      "exp://10.10.6.194:8081",
+      "exp://10.10.7.99:8081"
     ],
     credentials: true,
   })
