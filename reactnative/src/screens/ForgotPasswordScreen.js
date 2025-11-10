@@ -48,11 +48,8 @@ export default function ForgotPasswordScreen({ navigation, route }) {
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.innerContainer}>
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-          >
-            <Ionicons name="arrow-back" size={24} color="#1a73e8" />
+          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={24} color="#000" />
           </TouchableOpacity>
           
           <Text style={styles.title}>Quên mật khẩu</Text>
@@ -108,14 +105,16 @@ const styles = StyleSheet.create({
   },
   innerContainer: {
     padding: 20,
-    paddingTop: 60,
+  },
+  header: {
+    padding: 10,
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   backButton: {
-    position: 'absolute',
-    top: 20,
-    left: 20,
-    zIndex: 1,
     padding: 8,
+    marginLeft: -8,
   },
   title: {
     fontSize: 24,

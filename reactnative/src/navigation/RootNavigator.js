@@ -1,8 +1,10 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
-import { TouchableOpacity, Text, View } from 'react-native';
+import { TouchableOpacity, Text, View, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useContext } from 'react';
+import { AuthContext } from '../context/AuthContext';
  import HomeScreen from '../screens/HomeScreen';
  import MoviesScreen from '../screens/MoviesScreen';
  import MovieDetailScreen from '../screens/MovieDetailScreen';
@@ -53,6 +55,48 @@ import ResetPasswordScreen from '../screens/ResetPasswordScreen';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
+function AuthHeader({ isAuthenticated }) {
+  const navigation = useNavigation();
+  const { setToken } = useContext(AuthContext);
+  
+  const handleLogout = async () => {
+    await setToken(null);
+  };
+
+  if (isAuthenticated) {
+    return (
+      <View style={styles.headerContainer}>
+        <TouchableOpacity 
+          style={styles.authButton} 
+          onPress={handleLogout}
+        >
+          <Ionicons name="log-out-outline" size={20} color="#1a73e8" style={{ marginRight: 4 }} />
+          <Text style={styles.authButtonText}>Đăng xuất</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.headerContainer}>
+      <View style={styles.authButtonsContainer}>
+        <TouchableOpacity 
+          style={[styles.authButton, { marginRight: 12 }]} 
+          onPress={() => navigation.navigate('Login')}
+        >
+          <Text style={styles.authButtonText}>Đăng nhập</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={[styles.authButton, styles.registerButton]}
+          onPress={() => navigation.navigate('Register')}
+        >
+          <Text style={[styles.authButtonText, { color: '#fff' }]}>Đăng ký</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
 function MainTabs() {
   return (
     <Tab.Navigator
@@ -96,51 +140,49 @@ function MainTabs() {
   );
 }
 
+const styles = StyleSheet.create({
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  authButtonsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  authButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#1a73e8',
+  },
+  registerButton: {
+    backgroundColor: '#1a73e8',
+  },
+  authButtonText: {
+    color: '#1a73e8',
+    fontWeight: '600',
+    fontSize: 14,
+  },
+});
+
 export default function RootNavigator() {
+  const { token } = useContext(AuthContext);
+
   return (
     <Stack.Navigator
       screenOptions={{
-        headerRight: () => {
-          const navigation = useNavigation();
-          return (
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <TouchableOpacity 
-                onPress={() => navigation.navigate('Register')}
-                style={{
-                  marginRight: 16,
-                  paddingVertical: 6,
-                  paddingHorizontal: 12,
-                  borderRadius: 4,
-                  borderWidth: 1,
-                  borderColor: '#1a73e8',
-                  backgroundColor: 'white',
-                }}
-              >
-                <Text style={{ 
-                  color: '#1a73e8',
-                  fontWeight: '600',
-                  fontSize: 14,
-                }}>ĐĂNG KÝ</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                onPress={() => navigation.navigate('Login')}
-                style={{
-                  marginRight: 15,
-                  paddingVertical: 6,
-                  paddingHorizontal: 12,
-                  cursor: 'pointer',
-                  userSelect: 'none',
-                }}
-              >
-                <Text style={{ 
-                  color: '#000',
-                  fontWeight: '600',
-                  fontSize: 14,
-                }}>ĐĂNG NHẬP</Text>
-              </TouchableOpacity>
-            </View>
-          );
+        headerShown: true,
+        headerRight: () => <AuthHeader isAuthenticated={!!token} />,
+        headerTitle: '',
+        headerShadowVisible: false,
+        headerStyle: {
+          backgroundColor: '#fff',
         },
       }}
     >

@@ -92,6 +92,11 @@ export default function RegisterScreen({ navigation }) {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
     >
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back" size={24} color="#000" />
+        </TouchableOpacity>
+      </View>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <Text style={styles.title}>Đăng ký tài khoản</Text>
         
@@ -212,11 +217,14 @@ export default function RegisterScreen({ navigation }) {
           )}
         </View>
         
-        <Button 
-          title={loading ? 'Đang xử lý...' : 'Đăng ký'} 
-          onPress={onSubmit} 
-          disabled={loading} 
-        />
+        <View style={styles.buttonContainer}>
+          <Button
+            title={loading ? 'ĐANG XỬ LÝ...' : 'ĐĂNG KÝ'}
+            onPress={onSubmit}
+            disabled={loading}
+            color="#1a73e8"
+          />
+        </View>
 
         <View style={styles.loginContainer}>
           <Text>Đã có tài khoản? </Text>
@@ -233,6 +241,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    paddingTop: Platform.OS === 'ios' ? 40 : 10,
+  },
+  header: {
+    padding: 10,
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  backButton: {
+    padding: 8,
+    marginLeft: -8,
   },
   scrollContainer: {
     padding: 20,
@@ -308,13 +327,18 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 4,
   },
+  buttonContainer: {
+    marginTop: 24,
+    marginBottom: 16,
+  },
   loginContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 24,
+    marginTop: 8,
   },
   loginText: {
     color: '#1a73e8',
+    fontSize: 14,
     fontWeight: '500',
   }
 });
