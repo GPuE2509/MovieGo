@@ -18,12 +18,6 @@ const userSchema = new mongoose.Schema({
   point: { type: Number, min: 0, default: 0 },
   roles: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Role' }],
   coupons: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Coupon' }],
-  failedLoginAttempts: { type: Number, default: 0 },
-  lastFailedLogin: { type: Date, default: null },
-  resetPasswordToken: { type: String, default: null },
-  resetPasswordExpires: { type: Date, default: null },
-  otp: { type: String, default: null },
-  otpExpires: { type: Date, default: null }
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } });
 
 // Hash password before saving
