@@ -99,6 +99,53 @@ function AuthHeader({ isAuthenticated }) {
 }
 
 function MainTabs() {
+  const { user } = useContext(AuthContext);
+  console.log('Current user data:', user); // Debug log
+  
+  // Kiểm tra xem user có phải là admin không
+  const isAdmin = user?.roles?.some(role => {
+    const roleName = typeof role === 'string' ? role : (role.role_name || '');
+    return roleName === 'ROLE_ADMIN';
+  });
+  
+  console.log('Có phải admin không:', isAdmin); // Debug log
+  console.log('Danh sách vai trò:', user?.roles); // Debug log
+  
+  // Tạo một Tab Navigator riêng cho admin
+  const AdminTabs = () => (
+    <Tab.Navigator
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: '#1a73e8',
+        tabBarInactiveTintColor: 'gray',
+        tabBarStyle: { 
+          height: 60,
+          paddingBottom: 5,
+        },
+        tabBarItemStyle: {
+          justifyContent: 'center',
+        },
+      }}
+    >
+      <Tab.Screen 
+        name="Admin" 
+        component={AdminDashboardScreen}
+        options={{
+          tabBarLabel: 'Admin',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="settings-outline" size={size} color={color} />
+          ),
+        }}
+      />
+    </Tab.Navigator>
+  );
+
+  // Nếu là admin, chỉ trả về AdminTabs
+  if (isAdmin) {
+    return <AdminTabs />;
+  }
+
+  // Giao diện cho người dùng thông thường
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -111,7 +158,6 @@ function MainTabs() {
             Promotions: 'pricetags-outline',
             Festivals: 'ticket-outline',
             Profile: 'person-outline',
-            Admin: 'settings-outline',
           };
           const name = map[route.name] || 'ellipse-outline';
           return <Ionicons name={name} size={size} color={color} />;
@@ -127,13 +173,6 @@ function MainTabs() {
         {() => (
           <ProtectedScreen>
             <ProfileScreen />
-          </ProtectedScreen>
-        )}
-      </Tab.Screen>
-      <Tab.Screen name="Admin">
-        {() => (
-          <ProtectedScreen>
-            <AdminDashboardScreen />
           </ProtectedScreen>
         )}
       </Tab.Screen>

@@ -17,7 +17,7 @@
     "cors": "^2.8.5",
     "crypto-js": "^4.2.0",
     "debug": "~2.6.9",
-    "dotenv": "^16.3.1",
+    "dotenv": "^16.6.1",
     "express": "~4.16.1",
     "express-validator": "^7.0.1",
     "hbs": "~4.0.4",

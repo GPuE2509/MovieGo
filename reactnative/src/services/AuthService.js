@@ -55,15 +55,15 @@ export const register = async ({ first_name, last_name, phone, email, password, 
     const payload = {
       first_name: first_name?.trim(),
       last_name: last_name?.trim(),
-      phone: phone?.trim() || undefined,
       email: email?.trim(),
       password,
-      address: address?.trim() || undefined
+      phone: phone?.trim() || null,
+      address: address?.trim() || null,
     };
-    
-    // Remove undefined values
+
+    // Remove null or empty fields
     Object.keys(payload).forEach(key => {
-      if (payload[key] === undefined) {
+      if (payload[key] === null || payload[key] === '') {
         delete payload[key];
       }
     });
@@ -73,7 +73,11 @@ export const register = async ({ first_name, last_name, phone, email, password, 
     const res = await apiClient.post('/auth/register', payload);
     console.log('Registration response:', res.data);
     
-    return res.data?.data;
+    // Chỉ trả về thông báo thành công, không trả về token
+    return { 
+      success: true, 
+      message: 'Đăng ký tài khoản thành công. Vui lòng đăng nhập để tiếp tục.' 
+    };
   } catch (error) {
     console.error('Registration failed:', error);
     handleAxiosError(error);
