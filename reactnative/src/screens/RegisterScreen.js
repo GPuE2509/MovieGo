@@ -5,7 +5,7 @@ import { AuthContext } from '../context/AuthContext';
 import { register } from '../services/AuthService';
 
 export default function RegisterScreen({ navigation }) {
-  const { setToken } = useContext(AuthContext);
+  // Không cần sử dụng setToken nữa vì sẽ chuyển hướng đến trang đăng nhập
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
@@ -68,12 +68,11 @@ export default function RegisterScreen({ navigation }) {
       const data = await register(apiData);
       console.log('Registration response:', data);
       
-      if (data?.token) {
-        setSuccess('Đăng ký thành công! Đang chuyển hướng...');
-        await setToken(data.token);
-        // Add a small delay to show success message
+      if (data?.message) {
+        setSuccess('Đăng ký thành công! Đang chuyển hướng đến trang đăng nhập...');
+        // Chuyển hướng đến trang đăng nhập sau 1.5 giây
         setTimeout(() => {
-          navigation.navigate('MainTabs');
+          navigation.replace('Login');
         }, 1500);
       } else {
         setError('Đăng ký thất bại: Không nhận được token');

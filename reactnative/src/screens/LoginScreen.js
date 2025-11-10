@@ -18,7 +18,8 @@ export default function LoginScreen({ navigation }) {
     try {
       const data = await login({ email, password });
       if (data?.token) {
-        await setToken(data.token);
+        const userData = data.user; // Giả sử API trả về thông tin user trong response
+        await setToken(data.token, userData);
         navigation.goBack();
       } else {
         setError('Đăng nhập thất bại');
