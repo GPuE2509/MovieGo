@@ -1,21 +1,31 @@
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Button, Linking } from 'react-native';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getAllTheaters } from '../services/TheaterService';
-import { useContext, useState } from 'react';
+import { useContext, useState, useCallback } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
 export default function AdminTheatersScreen() {
   const { token } = useContext(AuthContext);
   const nav = useNavigation();
+  const queryClient = useQueryClient();
   const [currentPage, setCurrentPage] = useState(0);
   const [pageSize] = useState(10);
   
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['admin-theaters', currentPage, pageSize],
     queryFn: () => getAllTheaters({ page: currentPage, size: pageSize }, token),
     enabled: !!token,
   });
+
+  // Refresh data when screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      if (token) {
+        refetch();
+      }
+    }, [token, refetch])
+  );
 
   const list = Array.isArray(data) ? data : (data?.data?.data?.data || []);
   const pagination = data?.data?.data || {};
@@ -54,21 +64,19 @@ export default function AdminTheatersScreen() {
             
             <View style={styles.contactInfo}>
               {item?.phone && (
-                <TouchableOpacity 
+                <Text
                   style={styles.contactItem}
-                  onPress={() => Linking.openURL(`tel:${item.phone}`)}
                 >
                   <Text style={styles.contactText}>📞 {item.phone}</Text>
-                </TouchableOpacity>
+                </Text>
               )}
               
               {item?.email && (
-                <TouchableOpacity 
+                <Text 
                   style={styles.contactItem}
-                  onPress={() => Linking.openURL(`mailto:${item.email}`)}
                 >
                   <Text style={styles.contactText}>✉️ {item.email}</Text>
-                </TouchableOpacity>
+                </Text>
               )}
             </View>
             
@@ -171,7 +179,6 @@ const styles = StyleSheet.create({
   contactText: { 
     color: '#007AFF', 
     fontSize: 13,
-    textDecorationLine: 'underline'
   },
   statusContainer: { 
     flexDirection: 'row', 
