@@ -39,7 +39,7 @@ const adminSeatRouter = require("./src/routes/admin/seat");
 const showtimePublicRouter = require("./src/routes/showtimePublic");
 const adminShowtimeRouter = require("./src/routes/admin/showtime");
 const paymentsRouter = require("./src/routes/payments");
-const aiRouter = require("./src/routes/ai");
+// const aiRouter = require("./src/routes/ai"); // Temporarily disabled
 
 const app = express();
 
@@ -95,7 +95,7 @@ app.use("/api/v1", recommendationsRouter);
 app.use("/api/v1", showtimePublicRouter);
 app.use("/api/v1/admin", adminShowtimeRouter);
 app.use("/api/v1/payments", paymentsRouter);
-app.use("/api/v1/ai", aiRouter);
+// app.use("/api/v1/ai", aiRouter); // Temporarily disabled
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
