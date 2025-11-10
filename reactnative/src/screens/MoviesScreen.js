@@ -10,7 +10,9 @@ export default function MoviesScreen({ navigation }) {
   const renderItem = ({ item }) => (
     <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('MovieDetail', { id: item?.id })}>
       <Text style={styles.itemTitle} numberOfLines={1}>{item?.title || item?.name || `Movie #${item?.id}`}</Text>
-      {item?.genre && <Text style={styles.itemSub} numberOfLines={1}>{String(item.genre)}</Text>}
+      {item?.genreNames && <Text style={styles.itemSub} numberOfLines={1}>{String(item.genreNames)}</Text>}
+       <Text numberOfLines={1} style={styles.itemSub}>{item?.releaseDate}</Text>
+      
     </TouchableOpacity>
   );
 

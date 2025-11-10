@@ -15,8 +15,8 @@ export default function LoginScreen({ navigation }) {
     setError('');
     try {
       const data = await login({ email, password });
-      if (data?.accessToken) {
-        await setToken(data.accessToken);
+      if (data?.token) {
+        await setToken(data.token);
         navigation.goBack();
       } else {
         setError('Đăng nhập thất bại');

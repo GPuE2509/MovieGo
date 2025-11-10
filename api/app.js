@@ -48,10 +48,8 @@ app.use(
     origin: [
       "http://localhost:5173",
       "http://localhost:3000",
-      "https://movie-booking-vert-rho.vercel.app",
-      "https://movie-booking-back.vercel.app",
-      "https://movieticketbooking.io.vn",
-      "https://www.movieticketbooking.io.vn",
+      "exp://10.10.5.32:8081",
+      "http://localhost:8081"
     ],
     credentials: true,
   })

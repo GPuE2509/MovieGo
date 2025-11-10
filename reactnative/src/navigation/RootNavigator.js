@@ -175,16 +175,16 @@ export default function RootNavigator() {
         )}
       </Stack.Screen>
       <Stack.Screen name="AdminFestivalEdit">
-        {() => (
+        {({ route, navigation }) => (
           <ProtectedScreen>
-            <AdminFestivalEditScreen />
+            <AdminFestivalEditScreen route={route} navigation={navigation} />
           </ProtectedScreen>
         )}
       </Stack.Screen>
       <Stack.Screen name="AdminMovieCreate">
-        {() => (
+        {({ route, navigation }) => (
           <ProtectedScreen>
-            <AdminMovieCreateScreen />
+            <AdminMovieCreateScreen route={route} navigation={navigation} />
           </ProtectedScreen>
         )}
       </Stack.Screen>
@@ -203,37 +203,37 @@ export default function RootNavigator() {
         )}
       </Stack.Screen>
       <Stack.Screen name="AdminTheaterEdit">
-        {() => (
+        {({ route, navigation }) => (
           <ProtectedScreen>
-            <AdminTheaterEditScreen />
+            <AdminTheaterEditScreen route={route} navigation={navigation} />
           </ProtectedScreen>
         )}
       </Stack.Screen>
       <Stack.Screen name="AdminTheaterCreate">
-        {() => (
+        {({ route, navigation }) => (
           <ProtectedScreen>
-            <AdminTheaterCreateScreen />
+            <AdminTheaterCreateScreen route={route} navigation={navigation} />
           </ProtectedScreen>
         )}
       </Stack.Screen>
       <Stack.Screen name="AdminPaymentEdit">
-        {() => (
+        {({ route, navigation }) => (
           <ProtectedScreen>
-            <AdminPaymentEditScreen />
+            <AdminPaymentEditScreen route={route} navigation={navigation} />
           </ProtectedScreen>
         )}
       </Stack.Screen>
       <Stack.Screen name="AdminPaymentCreate">
-        {() => (
+        {({ route, navigation }) => (
           <ProtectedScreen>
-            <AdminPaymentCreateScreen />
+            <AdminPaymentCreateScreen route={route} navigation={navigation} />
           </ProtectedScreen>
         )}
       </Stack.Screen>
       <Stack.Screen name="AdminMovieEdit">
-        {() => (
+        {({ route, navigation }) => (
           <ProtectedScreen>
-            <AdminMovieEditScreen />
+            <AdminMovieEditScreen route={route} navigation={navigation} />
           </ProtectedScreen>
         )}
       </Stack.Screen>

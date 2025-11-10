@@ -8,7 +8,9 @@
 
    const renderMovie = ({ item }) => (
      <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('MovieDetail', { id: item?.id })}>
-       <Text numberOfLines={1} style={styles.cardTitle}>{item?.title || item?.name || `Movie #${item?.id}`}</Text>
+       <Text numberOfLines={1} style={styles.cardTitle}>{item?.title}</Text>
+       <Text numberOfLines={1} style={styles.cardTitle}>{Array.isArray(item?.genreNames) ? item?.genreNames.join(', ') : String(item.genreNames)}</Text>
+       <Text numberOfLines={1} style={styles.cardTitle}>{item?.releaseDate}</Text>
      </TouchableOpacity>
    );
 
