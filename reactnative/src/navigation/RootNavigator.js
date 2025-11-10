@@ -15,7 +15,6 @@ import { AuthContext } from '../context/AuthContext';
  import TicketPriceScreen from '../screens/TicketPriceScreen';
  import FestivalScreen from '../screens/FestivalScreen';
  import FestivalDetailScreen from '../screens/FestivalDetailScreen';
- import FilmWeekScreen from '../screens/FilmWeekScreen';
  import AboutScreen from '../screens/AboutScreen';
  import ContactScreen from '../screens/ContactScreen';
  import FaqsScreen from '../screens/FaqsScreen';
@@ -234,7 +233,6 @@ export default function RootNavigator() {
       <Stack.Screen name="TicketPrice" component={TicketPriceScreen} />
       <Stack.Screen name="Festival" component={FestivalScreen} />
       <Stack.Screen name="FestivalDetail" component={FestivalDetailScreen} />
-      <Stack.Screen name="FilmWeek" component={FilmWeekScreen} />
       <Stack.Screen name="About" component={AboutScreen} />
       <Stack.Screen name="Contact" component={ContactScreen} />
       <Stack.Screen name="Faqs" component={FaqsScreen} />
