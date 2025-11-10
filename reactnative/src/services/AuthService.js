@@ -3,8 +3,8 @@ import apiClient from './apiClient';
 import { storage } from '../utils/storage';
 
 const handleAxiosError = (error) => {
-  if (error?.response?.data?.data) {
-    throw new Error(error.response.data.data);
+  if (error?.response?.data) {
+    throw new Error(error.response.data);
   }
   throw new Error('Lỗi kết nối server hoặc server không phản hồi đúng định dạng.');
 };
