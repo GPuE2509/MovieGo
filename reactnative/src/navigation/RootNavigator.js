@@ -49,6 +49,7 @@ import ResetPasswordScreen from '../screens/ResetPasswordScreen';
  import AdminScreenCreateScreen from '../screens/AdminScreenCreateScreen';
  import AdminPaymentEditScreen from '../screens/AdminPaymentEditScreen';
  import AdminPaymentCreateScreen from '../screens/AdminPaymentCreateScreen';
+ import AIGeneratorScreen from '../screens/AIGeneratorScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -322,6 +323,13 @@ export default function RootNavigator() {
         {() => (
           <ProtectedScreen>
             <PaymentScreen />
+          </ProtectedScreen>
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="AIGenerator">
+        {({ route, navigation }) => (
+          <ProtectedScreen>
+            <AIGeneratorScreen route={route} navigation={navigation} />
           </ProtectedScreen>
         )}
       </Stack.Screen>
