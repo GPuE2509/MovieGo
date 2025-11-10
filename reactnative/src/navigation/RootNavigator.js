@@ -1,6 +1,8 @@
- import { createNativeStackNavigator } from '@react-navigation/native-stack';
- import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
- import { Ionicons } from '@expo/vector-icons';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Ionicons } from '@expo/vector-icons';
+import { TouchableOpacity, Text, View } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
  import HomeScreen from '../screens/HomeScreen';
  import MoviesScreen from '../screens/MoviesScreen';
  import MovieDetailScreen from '../screens/MovieDetailScreen';
@@ -20,6 +22,9 @@
  import PaymentScreen from '../screens/PaymentScreen';
  import AdminDashboardScreen from '../screens/AdminDashboardScreen';
  import LoginScreen from '../screens/LoginScreen';
+ import RegisterScreen from '../screens/RegisterScreen';
+ import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
+import ResetPasswordScreen from '../screens/ResetPasswordScreen';
  import ProtectedScreen from '../components/ProtectedScreen';
  import ShowtimesScreen from '../screens/ShowtimesScreen';
  import SeatSelectionScreen from '../screens/SeatSelectionScreen';
@@ -93,7 +98,52 @@ function MainTabs() {
 
 export default function RootNavigator() {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator
+      screenOptions={{
+        headerRight: () => {
+          const navigation = useNavigation();
+          return (
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <TouchableOpacity 
+                onPress={() => navigation.navigate('Register')}
+                style={{
+                  marginRight: 16,
+                  paddingVertical: 6,
+                  paddingHorizontal: 12,
+                  borderRadius: 4,
+                  borderWidth: 1,
+                  borderColor: '#1a73e8',
+                  backgroundColor: 'white',
+                }}
+              >
+                <Text style={{ 
+                  color: '#1a73e8',
+                  fontWeight: '600',
+                  fontSize: 14,
+                }}>ĐĂNG KÝ</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                onPress={() => navigation.navigate('Login')}
+                style={{
+                  marginRight: 15,
+                  paddingVertical: 6,
+                  paddingHorizontal: 12,
+                  cursor: 'pointer',
+                  userSelect: 'none',
+                }}
+              >
+                <Text style={{ 
+                  color: '#000',
+                  fontWeight: '600',
+                  fontSize: 14,
+                }}>ĐĂNG NHẬP</Text>
+              </TouchableOpacity>
+            </View>
+          );
+        },
+      }}
+    >
       <Stack.Screen name="MainTabs" component={MainTabs} />
       <Stack.Screen name="MovieDetail" component={MovieDetailScreen} />
       <Stack.Screen name="NewsDetail" component={NewsDetailScreen} />
@@ -107,7 +157,38 @@ export default function RootNavigator() {
       <Stack.Screen name="Contact" component={ContactScreen} />
       <Stack.Screen name="Faqs" component={FaqsScreen} />
       <Stack.Screen name="Policy" component={PolicyScreen} />
-      <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen 
+        name="Login" 
+        component={LoginScreen} 
+        options={{ 
+          title: 'Đăng nhập',
+          headerShown: false
+        }} 
+      />
+      <Stack.Screen 
+        name="Register" 
+        component={RegisterScreen} 
+        options={{ 
+          title: 'Đăng ký tài khoản',
+          headerShown: false
+        }} 
+      />
+      <Stack.Screen 
+        name="ForgotPassword" 
+        component={ForgotPasswordScreen} 
+        options={{ 
+          title: 'Quên mật khẩu',
+          headerShown: false
+        }} 
+      />
+      <Stack.Screen 
+        name="ResetPassword" 
+        component={ResetPasswordScreen} 
+        options={{ 
+          title: 'Đặt lại mật khẩu',
+          headerShown: false
+        }} 
+      />
       <Stack.Screen name="Showtimes" component={ShowtimesScreen} />
       <Stack.Screen name="SeatSelection" component={SeatSelectionScreen} />
       <Stack.Screen name="NearbyCinemas" component={NearbyCinemasScreen} />
