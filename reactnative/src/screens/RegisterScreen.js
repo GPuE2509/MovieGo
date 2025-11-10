@@ -19,6 +19,7 @@ export default function RegisterScreen({ navigation }) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const handleInputChange = (name, value) => {
     setFormData({
@@ -30,6 +31,7 @@ export default function RegisterScreen({ navigation }) {
   const onSubmit = async () => {
     setLoading(true);
     setError('');
+    setSuccess('');
     try {
       // Basic validation
       if (!formData.first_name || !formData.last_name || !formData.email || !formData.password || !formData.confirmPassword) {
@@ -40,14 +42,44 @@ export default function RegisterScreen({ navigation }) {
         throw new Error('Mật khẩu xác nhận không khớp');
       }
 
-      const data = await register(formData);
+      // Email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        throw new Error('Email không đúng định dạng');
+      }
+
+      // Password validation
+      if (formData.password.length < 6) {
+        throw new Error('Mật khẩu phải có ít nhất 6 ký tự');
+      }
+
+      // Map form data to API format
+      const apiData = {
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        email: formData.email,
+        password: formData.password,
+        phone: formData.phone,
+        address: formData.address
+      };
+
+      console.log('Sending registration data:', apiData);
+      
+      const data = await register(apiData);
+      console.log('Registration response:', data);
+      
       if (data?.token) {
+        setSuccess('Đăng ký thành công! Đang chuyển hướng...');
         await setToken(data.token);
-        navigation.navigate('MainTabs');
+        // Add a small delay to show success message
+        setTimeout(() => {
+          navigation.navigate('MainTabs');
+        }, 1500);
       } else {
-        setError('Đăng ký thất bại');
+        setError('Đăng ký thất bại: Không nhận được token');
       }
     } catch (e) {
+      console.error('Registration error:', e);
       setError(e?.message || 'Đăng ký thất bại');
     } finally {
       setLoading(false);
@@ -63,7 +95,17 @@ export default function RegisterScreen({ navigation }) {
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <Text style={styles.title}>Đăng ký tài khoản</Text>
         
-        {!!error && <Text style={styles.error}>{error}</Text>}
+        {!!error && (
+          <View style={[styles.messageContainer, styles.errorContainer]}>
+            <Text style={styles.error}>❌ {error}</Text>
+          </View>
+        )}
+        
+        {!!success && (
+          <View style={[styles.messageContainer, styles.successContainer]}>
+            <Text style={styles.success}>✅ {success}</Text>
+          </View>
+        )}
         
         <View style={styles.row}>
           <View style={[styles.inputContainer, { flex: 1, marginRight: 8 }]}>
@@ -202,10 +244,30 @@ const styles = StyleSheet.create({
     marginBottom: 24, 
     textAlign: 'center' 
   },
-  error: { 
-    color: 'red', 
+  messageContainer: {
+    padding: 12,
+    borderRadius: 8,
     marginBottom: 16,
-    textAlign: 'center'
+  },
+  error: { 
+    color: '#DC2626',
+    textAlign: 'center',
+    fontWeight: '500'
+  },
+  success: {
+    color: '#059669',
+    textAlign: 'center',
+    fontWeight: '500'
+  },
+  successContainer: {
+    backgroundColor: '#ECFDF5',
+    borderWidth: 1,
+    borderColor: '#10B981',
+  },
+  errorContainer: {
+    backgroundColor: '#FEF2F2',
+    borderWidth: 1,
+    borderColor: '#DC2626',
   },
   row: {
     flexDirection: 'row',
