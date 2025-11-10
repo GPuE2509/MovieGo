@@ -1,4 +1,16 @@
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  FlatList, 
+  TouchableOpacity, 
+  Alert, 
+  Dimensions,
+  ActivityIndicator,
+  ScrollView
+} from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import { useQuery } from '@tanstack/react-query';
 import { getUsers } from '../services/AdminUserService';
 import { useContext, useState, useEffect } from 'react';
@@ -130,40 +142,138 @@ export default function AdminUsersScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Quản lý người dùng</Text>
-      
-      {data?.data && (
-        <Text style={styles.subtitle}>
-          Tổng cộng: {data.data.totalElements} người dùng | Hiển thị {data.data.numberOfElements} / {data.data.size} trên trang
-        </Text>
-      )}
-      
-      {isLoading && <Text>Đang tải...</Text>}
-      {error && <Text style={{ color: 'red' }}>Lỗi: {String(error?.message || error)}</Text>}
-      
-      <FlatList
-        data={data?.data?.content || []}
-        keyExtractor={(item, idx) => String(item?.id ?? idx)}
-        renderItem={renderUserItem}
-        contentContainerStyle={{ paddingVertical: 8 }}
-        ListFooterComponent={renderPagination}
-        showsVerticalScrollIndicator={false}
-      />
+      <LinearGradient
+        colors={['#b91c1c', '#991b1b']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.header}
+      >
+        <View style={styles.headerContent}>
+          <TouchableOpacity 
+            style={styles.backButton} 
+            onPress={() => navigation.goBack()}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="arrow-back" size={24} color="#fff" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Quản lý người dùng</Text>
+          <View style={{ width: 24 }} />
+        </View>
+      </LinearGradient>
+
+      <View style={styles.content}>
+        {isLoading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#b91c1c" />
+            <Text style={styles.loadingText}>Đang tải dữ liệu...</Text>
+          </View>
+        ) : error ? (
+          <View style={styles.errorContainer}>
+            <Ionicons name="alert-circle-outline" size={32} color="#b91c1c" />
+            <Text style={styles.errorText}>
+              Có lỗi xảy ra: {String(error?.message || error)}
+            </Text>
+          </View>
+        ) : (
+          <>
+            {data?.data && (
+              <View style={styles.statsContainer}>
+                <Text style={styles.statsText}>
+                  Tổng cộng: <Text style={styles.highlight}>{data.data.totalElements}</Text> người dùng
+                </Text>
+                <Text style={styles.statsText}>
+                  Hiển thị: <Text style={styles.highlight}>{data.data.numberOfElements}</Text> / {data.data.size} trên trang
+                </Text>
+              </View>
+            )}
+            
+            <FlatList
+              data={data?.data?.content || []}
+              keyExtractor={(item, idx) => String(item?.id ?? idx)}
+              renderItem={renderUserItem}
+              contentContainerStyle={styles.listContent}
+              ListFooterComponent={renderPagination}
+              showsVerticalScrollIndicator={false}
+              ListEmptyComponent={
+                <View style={styles.emptyContainer}>
+                  <Ionicons name="people-outline" size={48} color="#ccc" />
+                  <Text style={styles.emptyText}>Không có người dùng nào</Text>
+                </View>
+              }
+            />
+          </>
+        )}
+      </View>
     </View>
   );
 }
 
+const { width } = Dimensions.get('window');
+
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, backgroundColor: '#fff' },
-  title: { fontSize: 22, fontWeight: '700', marginBottom: 8 },
-  subtitle: { fontSize: 16, color: '#666', marginBottom: 16 },
+  container: {
+    flex: 1,
+    backgroundColor: '#f8f9fa',
+  },
+  header: {
+    paddingTop: 50,
+    paddingBottom: 24,
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#fff',
+    textAlign: 'center',
+    flex: 1,
+  },
+  backButton: {
+    padding: 8,
+    marginLeft: -8,
+  },
+  content: {
+    flex: 1,
+    padding: 16,
+  },
+  statsContainer: {
+    backgroundColor: '#f0f2f5',
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 16,
+  },
+  statsText: {
+    fontSize: 14,
+    color: '#4b5563',
+    marginBottom: 4,
+  },
+  highlight: {
+    color: '#b91c1c',
+    fontWeight: '600',
+  },
   item: { 
-    padding: 12, 
-    borderWidth: 1, 
-    borderColor: '#eee', 
-    borderRadius: 8,
-    backgroundColor: '#f9f9f9',
-    marginBottom: 8
+    padding: 16,
+    borderRadius: 12,
+    backgroundColor: '#fff',
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
+    borderLeftWidth: 4,
+    borderLeftColor: '#b91c1c',
   },
   itemHeader: {
     flexDirection: 'row',
@@ -171,32 +281,121 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 8
   },
-  itemTitle: { fontWeight: '600', fontSize: 16, flex: 1 },
-  itemEmail: { fontWeight: '500', fontSize: 14, color: '#007AFF', marginBottom: 4 },
-  itemSub: { color: '#666', marginTop: 2, fontSize: 14 },
+  itemTitle: { 
+    fontWeight: '600', 
+    fontSize: 16, 
+    flex: 1,
+    color: '#1f2937',
+  },
+  itemEmail: { 
+    fontWeight: '500', 
+    fontSize: 14, 
+    color: '#3b82f6', 
+    marginBottom: 6,
+    textDecorationLine: 'underline',
+  },
+  itemSub: { 
+    color: '#6b7280', 
+    marginTop: 4, 
+    fontSize: 13,
+    lineHeight: 18,
+  },
   statusBadge: {
-    paddingHorizontal: 8,
+    paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
     fontSize: 12,
     fontWeight: '600',
     textAlign: 'center',
-    minWidth: 60
+    minWidth: 70,
+    textTransform: 'capitalize',
+    marginLeft: 8,
   },
   viewDetail: {
-    color: '#007AFF',
-    fontSize: 12,
-    fontWeight: '500',
-    marginTop: 8,
-    textAlign: 'right'
+    color: '#b91c1c',
+    fontSize: 13,
+    fontWeight: '600',
+    marginTop: 10,
+    textAlign: 'right',
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
   },
   pagination: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 16,
     paddingHorizontal: 8,
-    marginTop: 16
+    marginTop: 16,
+    gap: 16,
+  },
+  pageButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  pageButtonText: {
+    color: '#4b5563',
+    fontWeight: '600',
+  },
+  disabledButton: {
+    opacity: 0.5,
+  },
+  disabledText: {
+    color: '#9ca3af',
+  },
+  pageInfo: {
+    color: '#4b5563',
+    fontWeight: '500',
+    fontSize: 14,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  loadingText: {
+    marginTop: 12,
+    color: '#6b7280',
+    fontSize: 14,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  errorText: {
+    marginTop: 12,
+    color: '#b91c1c',
+    textAlign: 'center',
+    fontSize: 14,
+  },
+  emptyContainer: {
+    padding: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyText: {
+    marginTop: 12,
+    color: '#9ca3af',
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  listContent: {
+    paddingVertical: 8,
+    paddingBottom: 20,
   },
   pageButton: {
     paddingHorizontal: 16,
