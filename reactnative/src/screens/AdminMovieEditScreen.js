@@ -104,6 +104,15 @@ export default function AdminMovieEditScreen({ route = {}, navigation = {} }) {
           <View style={{ height: 12 }} />
           <Button title={saving ? 'Đang lưu...' : 'Lưu thay đổi'} onPress={onSave} disabled={saving || !title} />
           <View style={{ height: 8 }} />
+          <Button 
+            title="🤖 Tạo nội dung AI" 
+            color="#4CAF50" 
+            onPress={() => navigation.navigate('AIGenerator', { 
+              movieId: id, 
+              movieTitle: title || data?.data?.title 
+            })} 
+          />
+          <View style={{ height: 8 }} />
           <Button title="Xóa phim" color="#dc2626" onPress={onDelete} />
         </View>
       )}
