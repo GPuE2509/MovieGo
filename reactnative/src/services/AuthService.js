@@ -3,9 +3,27 @@ import apiClient from './apiClient';
 import { storage } from '../utils/storage';
 
 const handleAxiosError = (error) => {
+  console.error('API Error:', error);
+  
   if (error?.response?.data) {
-    throw new Error(error.response.data);
+    // If response has specific error message
+    const errorData = error.response.data;
+    if (typeof errorData === 'string') {
+      throw new Error(errorData);
+    }
+    if (errorData.message) {
+      throw new Error(errorData.message);
+    }
+    if (errorData.error) {
+      throw new Error(errorData.error);
+    }
+    throw new Error(JSON.stringify(errorData));
   }
+  
+  if (error?.message) {
+    throw new Error(error.message);
+  }
+  
   throw new Error('Lỗi kết nối server hoặc server không phản hồi đúng định dạng.');
 };
 
@@ -30,11 +48,34 @@ export const login = async ({ email, password }) => {
   }
 };
 
-export const register = async ({ firstName, lastName, username, phone, email, password, address }) => {
+export const register = async ({ first_name, last_name, phone, email, password, address }) => {
   try {
-    const res = await apiClient.post('/auth/register', { firstName, lastName, username, phone, email, password, address });
+    console.log('Registering user with data:', { first_name, last_name, phone, email, address });
+    
+    const payload = {
+      first_name: first_name?.trim(),
+      last_name: last_name?.trim(),
+      phone: phone?.trim() || undefined,
+      email: email?.trim(),
+      password,
+      address: address?.trim() || undefined
+    };
+    
+    // Remove undefined values
+    Object.keys(payload).forEach(key => {
+      if (payload[key] === undefined) {
+        delete payload[key];
+      }
+    });
+    
+    console.log('Final payload:', payload);
+    
+    const res = await apiClient.post('/auth/register', payload);
+    console.log('Registration response:', res.data);
+    
     return res.data?.data;
   } catch (error) {
+    console.error('Registration failed:', error);
     handleAxiosError(error);
   }
 };
