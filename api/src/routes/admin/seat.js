@@ -15,6 +15,33 @@ const seatController = require('../../controllers/seatController');
  *   get:
  *     summary: Lấy danh sách ghế
  *     tags: [AdminSeat]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: Trang hiện tại
+ *       - in: query
+ *         name: size
+ *         schema:
+ *           type: integer
+ *         description: Số lượng ghế mỗi trang
+ *       - in: query
+ *         name: sortBy
+ *         schema:
+ *           type: string
+ *         description: Trường sắp xếp
+ *       - in: query
+ *         name: direction
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *         description: Chiều sắp xếp
+ *       - in: query
+ *         name: keyword
+ *         schema:
+ *           type: string
+ *         description: Từ khóa tìm kiếm
  *     responses:
  *       200:
  *         description: Danh sách ghế
@@ -33,10 +60,21 @@ const seatController = require('../../controllers/seatController');
  *           schema:
  *             type: object
  *             properties:
- *               name:
+ *               screen_id:
  *                 type: string
+ *                 example: "1"
+ *               seat_number:
+ *                 type: string
+ *                 example: "A1"
+ *               row:
+ *                 type: string
+ *                 example: "A"
+ *               column:
+ *                 type: integer
+ *                 example: 1
  *               type:
  *                 type: string
+ *                 example: "STANDARD"
  *     responses:
  *       201:
  *         description: Tạo ghế thành công

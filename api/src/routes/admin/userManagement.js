@@ -7,6 +7,8 @@ const {
   updateUserStatusValidation,
   userIdValidation,
 } = require("../../dto/request/userDto");
+const authController = require('../../controllers/authController');
+const {banUserValidation} = require('../../dto/request/authDto');
 
 /**
  * @swagger
@@ -115,5 +117,26 @@ router.patch(
   updateUserStatusValidation,
   userManagementController.updateUserStatus
 );
+
+/**
+ * @swagger
+ * /api/v1/admin/users/ban:
+ *   post:
+ *     summary: Ban tài khoản người dùng
+ *     tags: [UserManagement]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Ban tài khoản thành công
+ */
+router.post('/ban', auth, adminMiddleware, banUserValidation, authController.banUser);
 
 module.exports = router;
