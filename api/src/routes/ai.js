@@ -4,6 +4,51 @@ const { auth } = require('../middleware/auth');
 const { generateEventContent } = require('../controllers/aiController');
 
 /**
+ * @swagger
+ * tags:
+ *   name: AI
+ *   description: Tích hợp AI cho sự kiện phim
+ */
+
+/**
+ * @swagger
+ * /api/v1/ai/generate/{movieId}:
+ *   post:
+ *     summary: Sinh nội dung AI cho sự kiện phim
+ *     tags: [AI]
+ *     parameters:
+ *       - in: path
+ *         name: movieId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               eventTheme:
+ *                 type: string
+ *                 example: "Premiere Night"
+ *     responses:
+ *       200:
+ *         description: Nội dung AI cho sự kiện phim
+ */
+
+/**
+ * @swagger
+ * /api/v1/ai/health:
+ *   get:
+ *     summary: Kiểm tra trạng thái dịch vụ AI
+ *     tags: [AI]
+ *     responses:
+ *       200:
+ *         description: Dịch vụ AI đang hoạt động
+ */
+
+/**
  * @route POST /api/ai/generate/:movieId
  * @desc Generate AI content (description and image prompt) for movie event
  * @access Private

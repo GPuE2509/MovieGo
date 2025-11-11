@@ -5,6 +5,76 @@ const { auth, adminMiddleware } = require('../../middleware/auth');
 const { createShowtimeValidation } = require('../../dto/request/showtimeDto');
 const { validationResult } = require('express-validator');
 
+/**
+ * @swagger
+ * tags:
+ *   name: AdminShowtime
+ *   description: Quản lý suất chiếu (Admin)
+ */
+
+/**
+ * @swagger
+ * /api/v1/admin/showtime/create:
+ *   post:
+ *     summary: Tạo suất chiếu mới
+ *     tags: [AdminShowtime]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               movieId:
+ *                 type: string
+ *               theaterId:
+ *                 type: string
+ *               date:
+ *                 type: string
+ *                 format: date
+ *               time:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Tạo suất chiếu thành công
+ */
+
+/**
+ * @swagger
+ * /api/v1/admin/showtime/delete/{id}:
+ *   delete:
+ *     summary: Xóa suất chiếu
+ *     tags: [AdminShowtime]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Xóa suất chiếu thành công
+ *       404:
+ *         description: Không tìm thấy suất chiếu
+ */
+
+/**
+ * @swagger
+ * /api/v1/admin/showtimes/movie/{movieId}:
+ *   get:
+ *     summary: Lấy danh sách suất chiếu theo phim
+ *     tags: [AdminShowtime]
+ *     parameters:
+ *       - in: path
+ *         name: movieId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Danh sách suất chiếu
+ */
+
 // helper to handle validation errors in route
 function handleValidation(req, res, next) {
   const errors = validationResult(req);

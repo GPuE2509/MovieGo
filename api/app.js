@@ -7,6 +7,29 @@ const logger = require("morgan");
 const cors = require("cors");
 const connectDB = require("./src/config/database");
 
+// Swagger setup
+const swaggerUi = require('swagger-ui-express');
+const swaggerJsdoc = require('swagger-jsdoc');
+
+const swaggerOptions = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'MovieGo API',
+      version: '1.0.0',
+      description: 'API documentation for MovieGo',
+    },
+    servers: [
+      {
+        url: 'http://localhost:3000',
+      },
+    ],
+  },
+  apis: ['./src/routes/**/*.js', './src/models/**/*.js'], // Đường dẫn tới các file chứa API docs
+};
+
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
+
 // Connect to database
 connectDB();
 
@@ -69,6 +92,9 @@ app.use(express.urlencoded({ extended: false, limit: "10mb" }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
+// Swagger route
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/admin", adminMovieRouter);
 app.use("/api/v1/admin", adminGenreRouter);
@@ -91,7 +117,7 @@ app.use("/api/v1/home", homeRouter);
 app.use("/api/v1", homeAliasRouter);
 app.use("/api/v1", theaterPublicRouter);
 app.use("/api/v1", movieSelectionPublicRouter);
-app.use("/api/v1", userCouponRouter);
+app.use("/api/v1/user", userCouponRouter);
 app.use("/api/v1", sidebarManagementRouter);
 app.use("/api/v1", ticketPricePublicRouter);
 app.use("/api/v1", recommendationsRouter);
