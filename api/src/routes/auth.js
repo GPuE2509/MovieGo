@@ -9,7 +9,6 @@ const {
   forgotPasswordValidation,
   verifyOTPValidation,
   resetPasswordValidation,
-  banUserValidation
 } = require('../dto/request/authDto');
 
 /**
@@ -52,7 +51,7 @@ const {
  *     requestBody:
  *       required: true
  *       content:
- *         multipart/form-data:
+ *         application/json:
  *           schema:
  *             type: object
  *             properties:
@@ -60,9 +59,14 @@ const {
  *                 type: string
  *               password:
  *                 type: string
- *               avatar:
+ *               first_name:
  *                 type: string
- *                 format: binary
+ *               last_name:
+ *                 type: string
+ *               phone:
+ *                  type: string
+ *               address:
+ *                  type: string
  *     responses:
  *       201:
  *         description: Đăng ký thành công
@@ -139,26 +143,6 @@ const {
  *         description: Đặt lại mật khẩu thành công
  */
 
-/**
- * @swagger
- * /api/v1/auth/ban:
- *   post:
- *     summary: Ban tài khoản người dùng
- *     tags: [Auth]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               userId:
- *                 type: string
- *     responses:
- *       200:
- *         description: Ban tài khoản thành công
- */
-
 // Public routes
 router.post('/login', loginValidation, authController.login);
 router.post('/register', upload.single('avatar'), registerValidation, authController.register);
@@ -168,6 +152,5 @@ router.post('/forgot-password', forgotPasswordValidation, authController.forgotP
 router.post('/logout', auth, authController.logout);
 router.post('/verify-otp', auth, verifyOTPValidation, authController.verifyOTP);
 router.post('/reset-password', auth, resetPasswordValidation, authController.resetPassword);
-router.post('/ban', auth, banUserValidation, authController.banUser);
 
 module.exports = router;

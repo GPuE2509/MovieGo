@@ -24,6 +24,16 @@ const swaggerOptions = {
         url: 'http://localhost:3000',
       },
     ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
+    },
+    security: [{ bearerAuth: [] }],
   },
   apis: ['./src/routes/**/*.js', './src/models/**/*.js'], // Đường dẫn tới các file chứa API docs
 };
@@ -40,7 +50,6 @@ const adminFestivalRouter = require("./src/routes/admin/festival");
 const adminUserManagementRouter = require("./src/routes/admin/userManagement");
 const userProfileRouter = require("./src/routes/user/profile");
 const userBookingRouter = require("./src/routes/user/booking");
-const homeRouter = require("./src/routes/home");
 const homeAliasRouter = require("./src/routes/homeAlias");
 const adminGenreRouter = require("./src/routes/admin/genre");
 const adminNewsRouter = require("./src/routes/admin/news");
@@ -113,7 +122,6 @@ app.use("/api/v1/admin", adminBannerRouter);
 app.use("/api/v1/admin", adminSeatRouter);
 app.use("/api/v1/user", userProfileRouter);
 app.use("/api/v1/user/bookings", userBookingRouter);
-app.use("/api/v1/home", homeRouter);
 app.use("/api/v1", homeAliasRouter);
 app.use("/api/v1", theaterPublicRouter);
 app.use("/api/v1", movieSelectionPublicRouter);
