@@ -22,6 +22,20 @@ const { ticketPricePublicQueryValidation, applicableTicketPriceQueryValidation }
  *         schema:
  *           type: string
  *         description: Ngày xem giá vé
+	*       - in: query
+	*         name: typeSeat
+	*         schema:
+	*           type: string
+	*           enum: [STANDARD, VIP, SWEETBOX]
+	*         required: true
+	*         description: Loại ghế
+	*       - in: query
+	*         name: typeMovie
+	*         schema:
+	*           type: string
+	*           enum: [2D, 3D, 4DX, IMAX]
+	*         required: true
+	*         description: Loại phim
  *     responses:
  *       200:
  *         description: Danh sách giá vé

@@ -1,7 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const promotionManagementController = require("../../controllers/promotionManagementController");
-const { auth, adminMiddleware } = require("../../middleware/auth");
+const {
+  auth,
+  adminMiddleware
+} = require("../../middleware/auth");
 const {
   promotionQueryValidation,
   createPromotionValidation,
@@ -59,10 +62,18 @@ const {
  *           schema:
  *             type: object
  *             properties:
- *               title:
+ *                  title:
  *                 type: string
  *               description:
  *                 type: string
+ *                discount_amount: / discount_percentage:
+ *                type: number
+              start_date:
+  *                type: string
+              end_date:
+  *                type: string
+                status:
+  *                 type: boolean
  *     responses:
  *       201:
  *         description: Tạo khuyến mãi thành công
