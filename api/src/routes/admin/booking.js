@@ -90,11 +90,6 @@ const { validationResult } = require("express-validator");
  *           type: array
  *         message:
  *           type: string
- *   securitySchemes:
- *     BearerAuth:
- *       type: http
- *       scheme: bearer
- *       bearerFormat: JWT
  */
 
 /**
@@ -104,8 +99,6 @@ const { validationResult } = require("express-validator");
  *     summary: Lấy danh sách tất cả booking
  *     description: Lấy danh sách booking với phân trang, tìm kiếm và sắp xếp. Chỉ dành cho Admin.
  *     tags: [AdminBooking]
- *     security:
- *       - BearerAuth: []
  *     parameters:
  *       - in: query
  *         name: search
@@ -168,8 +161,6 @@ const { validationResult } = require("express-validator");
  *     summary: Lấy thông tin chi tiết booking theo ID
  *     description: Lấy thông tin đầy đủ của một booking bao gồm thông tin user, showtime, ghế và thanh toán
  *     tags: [AdminBooking]
- *     security:
- *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -213,8 +204,6 @@ const { validationResult } = require("express-validator");
  *       Cập nhật trạng thái booking. Các trạng thái hợp lệ: PENDING, COMPLETED, CANCELLED.
  *       Quy tắc chuyển đổi: PENDING → COMPLETED/CANCELLED, COMPLETED → CANCELLED, CANCELLED → không thể chuyển
  *     tags: [AdminBooking]
- *     security:
- *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -267,8 +256,6 @@ const { validationResult } = require("express-validator");
  *     summary: Lấy thống kê booking
  *     description: Lấy các thống kê tổng quan về booking như tổng số booking, doanh thu, phân bố theo trạng thái
  *     tags: [AdminBooking]
- *     security:
- *       - BearerAuth: []
  *     responses:
  *       200:
  *         description: Lấy thống kê booking thành công

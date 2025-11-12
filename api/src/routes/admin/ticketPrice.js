@@ -104,11 +104,6 @@ const {
  *           type: array
  *           items:
  *             type: object
- *   securitySchemes:
- *     BearerAuth:
- *       type: http
- *       scheme: bearer
- *       bearerFormat: JWT
  */
 
 /**
@@ -125,8 +120,6 @@ const {
  *       - **Loại ngày**: Ngày thường (false) vs Cuối tuần/lễ (true)
  *       - **Khung giờ**: Từ start_time đến end_time trong ngày
  *     tags: [AdminTicketPrice]
- *     security:
- *       - BearerAuth: []
  *     parameters:
  *       - in: query
  *         name: typeSeat
@@ -216,8 +209,6 @@ const {
  *     summary: Lấy thông tin chi tiết bảng giá vé theo ID
  *     description: Lấy thông tin đầy đủ của một bảng giá vé theo ID
  *     tags: [AdminTicketPrice]
- *     security:
- *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -284,8 +275,6 @@ const {
  *       - Giá vé tính bằng VND, không âm
  *       - day_type: false = ngày thường, true = cuối tuần/lễ
  *     tags: [AdminTicketPrice]
- *     security:
- *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -413,8 +402,6 @@ const {
  *     summary: Cập nhật bảng giá vé
  *     description: Cập nhật thông tin bảng giá vé. Có thể cập nhật một phần hoặc toàn bộ thông tin.
  *     tags: [AdminTicketPrice]
- *     security:
- *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -518,8 +505,6 @@ const {
  *       **Lưu ý:** Nên cân nhắc việc set `is_active: false` thay vì xóa hoàn toàn
  *       để giữ lại dữ liệu lịch sử cho các booking đã tồn tại.
  *     tags: [AdminTicketPrice]
- *     security:
- *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id

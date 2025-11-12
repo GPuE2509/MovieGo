@@ -127,11 +127,6 @@ const {
  *           type: array
  *           items:
  *             type: object
- *   securitySchemes:
- *     BearerAuth:
- *       type: http
- *       scheme: bearer
- *       bearerFormat: JWT
  */
 
 /**
@@ -141,8 +136,6 @@ const {
  *     summary: Lấy danh sách tất cả lễ hội
  *     description: Lấy danh sách lễ hội với phân trang, tìm kiếm và sắp xếp. Chỉ dành cho Admin.
  *     tags: [AdminFestival]
- *     security:
- *       - BearerAuth: []
  *     parameters:
  *       - in: query
  *         name: page
@@ -227,8 +220,6 @@ const {
  *     summary: Lấy thông tin chi tiết lễ hội theo ID
  *     description: Lấy thông tin đầy đủ của một lễ hội theo ID
  *     tags: [AdminFestival]
- *     security:
- *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -282,8 +273,6 @@ const {
  *     summary: Tạo lễ hội mới
  *     description: Tạo lễ hội mới với thông tin và hình ảnh. Hỗ trợ upload file hình ảnh lên Cloudinary.
  *     tags: [AdminFestival]
- *     security:
- *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -360,8 +349,6 @@ const {
  *     summary: Cập nhật thông tin lễ hội
  *     description: Cập nhật thông tin lễ hội. Hỗ trợ cập nhật cả hình ảnh thông qua multipart/form-data.
  *     tags: [AdminFestival]
- *     security:
- *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -442,8 +429,6 @@ const {
  *     summary: Cập nhật hình ảnh lễ hội
  *     description: Cập nhật chỉ hình ảnh cho lễ hội. Yêu cầu file hình ảnh bắt buộc.
  *     tags: [AdminFestival]
- *     security:
- *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -519,8 +504,6 @@ const {
  *     summary: Xóa lễ hội
  *     description: Xóa lễ hội khỏi hệ thống. Thao tác này không thể hoàn tác.
  *     tags: [AdminFestival]
- *     security:
- *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -574,8 +557,6 @@ const {
  *     summary: Lấy danh sách lễ hội nổi bật
  *     description: Lấy danh sách các lễ hội mới nhất (theo thời gian tạo) để hiển thị nổi bật
  *     tags: [AdminFestival]
- *     security:
- *       - BearerAuth: []
  *     parameters:
  *       - in: query
  *         name: limit

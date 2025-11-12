@@ -105,11 +105,6 @@ const {
  *           type: array
  *           items:
  *             type: object
- *   securitySchemes:
- *     BearerAuth:
- *       type: http
- *       scheme: bearer
- *       bearerFormat: JWT
  */
 
 /**
@@ -125,8 +120,6 @@ const {
  *       - Cần đăng nhập và có role USER
  *       - ID trong path phải trùng với ID của user đang đăng nhập
  *     tags: [UserProfile]
- *     security:
- *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -211,8 +204,6 @@ router.get(
  *       - `address`: Bắt buộc, chuỗi không rỗng
  *       - `email`: Không thể thay đổi thông qua API này
  *     tags: [UserProfile]
- *     security:
- *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -354,8 +345,6 @@ router.put(
  *       3. Cập nhật URL avatar trong database
  *       4. Trả về URL avatar mới
  *     tags: [UserProfile]
- *     security:
- *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -468,8 +457,6 @@ router.put(
  *       - Mật khẩu mới phải khác mật khẩu cũ
  *       - confirmNewPassword phải trùng với newPassword
  *     tags: [UserProfile]
- *     security:
- *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
