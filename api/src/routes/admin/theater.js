@@ -53,11 +53,20 @@ const { theaterQueryValidation, createTheaterValidation, updateTheaterValidation
  *         application/json:
  *           schema:
  *             type: object
+ *             required: [name, address, city]
  *             properties:
  *               name:
  *                 type: string
  *               address:
  *                 type: string
+ *               city:
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               is_active:
+ *                 type: boolean
  *     responses:
  *       201:
  *         description: Tạo rạp thành công
@@ -75,6 +84,7 @@ const { theaterQueryValidation, createTheaterValidation, updateTheaterValidation
  *         required: true
  *         schema:
  *           type: string
+ *           pattern: ^[a-fA-F0-9]{24}$
  *     requestBody:
  *       required: true
  *       content:
@@ -86,6 +96,14 @@ const { theaterQueryValidation, createTheaterValidation, updateTheaterValidation
  *                 type: string
  *               address:
  *                 type: string
+ *               city:
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               is_active:
+ *                 type: boolean
  *     responses:
  *       200:
  *         description: Cập nhật rạp thành công

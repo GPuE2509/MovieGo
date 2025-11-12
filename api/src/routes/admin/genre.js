@@ -35,7 +35,7 @@ const { queryValidation, createGenreValidation, updateGenreValidation } = requir
  *           schema:
  *             type: object
  *             properties:
- *               name:
+ *               genre_name:
  *                 type: string
  *     responses:
  *       201:
@@ -54,6 +54,7 @@ const { queryValidation, createGenreValidation, updateGenreValidation } = requir
  *         required: true
  *         schema:
  *           type: string
+ *           
  *     requestBody:
  *       required: true
  *       content:
@@ -61,7 +62,7 @@ const { queryValidation, createGenreValidation, updateGenreValidation } = requir
  *           schema:
  *             type: object
  *             properties:
- *               name:
+ *               genre_name:
  *                 type: string
  *     responses:
  *       200:
@@ -80,9 +81,10 @@ const { queryValidation, createGenreValidation, updateGenreValidation } = requir
  *         required: true
  *         schema:
  *           type: string
+ 
  *     responses:
- *       200:
- *         description: Xóa thể loại phim thành công
+ *       204:
+ *         description: Xóa thể loại phim thành công (No Content)
  *       404:
  *         description: Không tìm thấy thể loại phim
  */
