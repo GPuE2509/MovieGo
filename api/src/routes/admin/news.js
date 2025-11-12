@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const newsController = require('../../controllers/newsController');
 const upload = require('../../middleware/upload');
+const cloudinary = require('../../config/cloudinary');
+const { Readable } = require('stream');
 const { auth, adminMiddleware } = require('../../middleware/auth');
 const { newsQueryValidation, createNewsValidation, updateNewsValidation } = require('../../dto/request/newsDto');
 
@@ -11,6 +13,32 @@ const { newsQueryValidation, createNewsValidation, updateNewsValidation } = requ
  *   name: AdminNews
  *   description: Quản lý tin tức (Admin)
  */
+
+// Middleware: upload image file to Cloudinary if present, then set req.body.image to URL
+async function uploadImageToCloudinary(req, res, next) {
+  try {
+    if (!req.file) return next();
+    // Convert buffer to readable stream without external deps
+    const bufferToStream = (buffer) => {
+      const readable = new Readable();
+      readable._read = () => {};
+      readable.push(buffer);
+      readable.push(null);
+      return readable;
+    };
+    const secureUrl = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream({ folder: 'news' }, (err, result) => {
+        if (err) return reject(err);
+        resolve(result.secure_url);
+      });
+      bufferToStream(req.file.buffer).pipe(uploadStream);
+    });
+    req.body.image = secureUrl;
+    return next();
+  } catch (err) {
+    return res.status(500).json({ success: false, message: 'Image upload failed', error: err.message });
+  }
+}
 
 /**
  * @swagger
@@ -122,10 +150,26 @@ const { newsQueryValidation, createNewsValidation, updateNewsValidation } = requ
 router.get('/news', auth, adminMiddleware, newsQueryValidation, newsController.list);
 
 // Create a news item
-router.post('/news/create', auth, adminMiddleware, upload.single('image'), createNewsValidation, newsController.create);
+router.post(
+  '/news/create',
+  auth,
+  adminMiddleware,
+  upload.single('image'),
+  uploadImageToCloudinary,
+  createNewsValidation,
+  newsController.create
+);
 
 // Update a news item
-router.put('/news/update/:id', auth, adminMiddleware, upload.single('image'), updateNewsValidation, newsController.update);
+router.put(
+  '/news/update/:id',
+  auth,
+  adminMiddleware,
+  upload.single('image'),
+  uploadImageToCloudinary,
+  updateNewsValidation,
+  newsController.update
+);
 
 // Delete a news item
 router.delete('/news/delete/:id', auth, adminMiddleware, newsController.remove);
