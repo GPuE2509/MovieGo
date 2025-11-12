@@ -27,6 +27,21 @@ const { auth, adminMiddleware } = require("../../middleware/auth");
  *   get:
  *     summary: Thống kê vé
  *     tags: [AdminStatistics]
+ *     parameters:
+ *       - in: query
+ *         name: startDate
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Ngày bắt đầu (YYYY-MM-DD)
+ *       - in: query
+ *         name: endDate
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Ngày kết thúc (YYYY-MM-DD)
  *     responses:
  *       200:
  *         description: Thống kê vé
@@ -38,6 +53,21 @@ const { auth, adminMiddleware } = require("../../middleware/auth");
  *   get:
  *     summary: Thống kê doanh thu nhà cung cấp
  *     tags: [AdminStatistics]
+ *     parameters:
+ *       - in: query
+ *         name: startDate
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Ngày bắt đầu (YYYY-MM-DD)
+ *       - in: query
+ *         name: endDate
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Ngày kết thúc (YYYY-MM-DD)
  *     responses:
  *       200:
  *         description: Thống kê doanh thu nhà cung cấp
@@ -49,6 +79,21 @@ const { auth, adminMiddleware } = require("../../middleware/auth");
  *   get:
  *     summary: Thống kê doanh thu hệ thống
  *     tags: [AdminStatistics]
+ *     parameters:
+ *       - in: query
+ *         name: startDate
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Ngày bắt đầu (YYYY-MM-DD)
+ *       - in: query
+ *         name: endDate
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Ngày kết thúc (YYYY-MM-DD)
  *     responses:
  *       200:
  *         description: Thống kê doanh thu hệ thống
@@ -60,6 +105,21 @@ const { auth, adminMiddleware } = require("../../middleware/auth");
  *   get:
  *     summary: Thống kê tin tức & sự kiện
  *     tags: [AdminStatistics]
+ *     parameters:
+ *       - in: query
+ *         name: startDate
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Ngày bắt đầu (YYYY-MM-DD)
+ *       - in: query
+ *         name: endDate
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Ngày kết thúc (YYYY-MM-DD)
  *     responses:
  *       200:
  *         description: Thống kê tin tức & sự kiện
@@ -71,6 +131,21 @@ const { auth, adminMiddleware } = require("../../middleware/auth");
  *   get:
  *     summary: Thống kê phim
  *     tags: [AdminStatistics]
+ *     parameters:
+ *       - in: query
+ *         name: startDate
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Ngày bắt đầu (YYYY-MM-DD)
+ *       - in: query
+ *         name: endDate
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Ngày kết thúc (YYYY-MM-DD)
  *     responses:
  *       200:
  *         description: Thống kê phim
