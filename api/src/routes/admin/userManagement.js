@@ -148,11 +148,6 @@ const { banUserValidation } = require("../../dto/request/authDto");
  *           type: array
  *           items:
  *             type: object
- *   securitySchemes:
- *     BearerAuth:
- *       type: http
- *       scheme: bearer
- *       bearerFormat: JWT
  */
 
 /**
@@ -162,8 +157,6 @@ const { banUserValidation } = require("../../dto/request/authDto");
  *     summary: Lấy danh sách tất cả người dùng
  *     description: Lấy danh sách người dùng với phân trang, tìm kiếm và lọc theo trạng thái. Chỉ dành cho Admin. Hệ thống tự động cập nhật trạng thái cho các user hết hạn ban.
  *     tags: [AdminUserManagement]
- *     security:
- *       - BearerAuth: []
  *     parameters:
  *       - in: query
  *         name: page
@@ -266,8 +259,6 @@ router.get(
  *     summary: Lấy thông tin chi tiết người dùng theo ID
  *     description: Lấy thông tin đầy đủ của một người dùng theo ID. Hệ thống tự động kiểm tra và cập nhật trạng thái nếu hết hạn ban.
  *     tags: [AdminUserManagement]
- *     security:
- *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -348,8 +339,6 @@ router.get(
  *
  *       Khi chặn tài khoản có thể set `ban_until` để tự động mở khóa sau thời gian nhất định.
  *     tags: [AdminUserManagement]
- *     security:
- *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -454,8 +443,6 @@ router.patch(
  *
  *       Tài khoản sẽ được chuyển sang trạng thái BLOCKED và không thể đăng nhập cho đến khi được mở khóa.
  *     tags: [AdminUserManagement]
- *     security:
- *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
