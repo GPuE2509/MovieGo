@@ -30,7 +30,7 @@ class SeatController {
   async update(req, res) {
     try {
       const updated = await seatService.updateSeat(req.params.id, req.body);
-      return res.status(200).json({ success: true, data: updated });
+      return res.status(204).json({ success: true, data: updated });
     } catch (err) {
       if (err.message === "Seat not found") return res.status(404).json({ success: false, message: err.message });
       return res.status(400).json({ success: false, message: err.message });

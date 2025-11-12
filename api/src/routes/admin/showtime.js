@@ -25,15 +25,16 @@ const { validationResult } = require('express-validator');
  *           schema:
  *             type: object
  *             properties:
- *               movieId:
- *                 type: string
- *               theaterId:
- *                 type: string
- *               date:
- *                 type: string
- *                 format: date
- *               time:
- *                 type: string
+*               movie_id:
+*                 type: string
+*               screen_id:
+*                 type: string
+*               start_time:
+*                 type: string
+*                 format: date-time
+*               end_time:
+*                 type: string
+*                 format: date-time
  *     responses:
  *       201:
  *         description: Tạo suất chiếu thành công
@@ -70,6 +71,32 @@ const { validationResult } = require('express-validator');
  *         required: true
  *         schema:
  *           type: string
+ *       - in: query
+ *         name: theaterId
+ *         schema:
+ *           type: string
+ *         description: Lọc theo rạp chiếu
+ *       - in: query
+ *         name: screenId
+ *         schema:
+ *           type: string
+ *         description: Lọc theo phòng chiếu
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: Trang hiện tại (pagination)
+ *       - in: query
+ *         name: size
+ *         schema:
+ *           type: integer
+ *         description: Số lượng mỗi trang (pagination)
+ *       - in: query
+ *         name: date
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Lọc theo ngày chiếu
  *     responses:
  *       200:
  *         description: Danh sách suất chiếu
