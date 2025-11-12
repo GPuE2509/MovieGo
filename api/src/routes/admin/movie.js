@@ -9,6 +9,14 @@ const {
   updateMovieValidation
 } = require('../../dto/request/movieDto');
 
+const isValidObjectId = (id) => /^[a-fA-F0-9]{24}$/.test(id);
+const validateIdParam = (req, res, next) => {
+  if (!isValidObjectId(req.params.id)) {
+    return res.status(400).json({ success: false, message: 'Invalid id format' });
+  }
+  next();
+};
+
 /**
  * @swagger
  * tags:
@@ -22,6 +30,40 @@ const {
  *   get:
  *     summary: Lấy danh sách phim
  *     tags: [AdminMovie]
+ *     parameters:
+ *       - in: query
+ *         name: title
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: Lọc theo tiêu đề phim
+ *       - in: query
+ *         name: author
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: Lọc theo tác giả/đạo diễn
+ *       - in: query
+ *         name: sortBy
+ *         schema:
+ *           type: string
+ *           default: createdAt
+ *         required: false
+ *         description: Trường sắp xếp
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 0
+ *         required: false
+ *         description: Trang (bắt đầu từ 0)
+ *       - in: query
+ *         name: size
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         required: false
+ *         description: Số phần tử mỗi trang
  *     responses:
  *       200:
  *         description: Danh sách phim
@@ -39,6 +81,8 @@ const {
  *         required: true
  *         schema:
  *           type: string
+ *           pattern: ^[a-fA-F0-9]{24}$
+ *           example: 64f4bd34b24882bcd0fbfb72
  *     responses:
  *       200:
  *         description: Thông tin phim
@@ -61,9 +105,36 @@ const {
  *             properties:
  *               title:
  *                 type: string
+ *               description:
+ *                 type: string
+ *               author:
+ *                 type: string
  *               image:
  *                 type: string
  *                 format: binary
+ *               trailer:
+ *                 type: string
+ *                 description: URL trailer
+ *               type:
+ *                 type: string
+ *               duration:
+ *                 type: integer
+ *                 description: Thời lượng (phút)
+ *               releaseDate:
+ *                 type: string
+ *                 format: date
+ *                 example: 2025-03-15
+ *               actors:
+ *                 type: string
+ *               nation:
+ *                 type: string
+ *               genreIds:
+ *                 type: array
+ *                 description: Danh sách ObjectId của thể loại; gửi nhiều key trùng tên genreIds trong form-data
+ *                 items:
+ *                   type: string
+ *                   pattern: ^[a-fA-F0-9]{24}$
+ *                   example: 64f8a2b3c4d5e6f7890abc12
  *     responses:
  *       201:
  *         description: Tạo phim thành công
@@ -81,6 +152,7 @@ const {
  *         required: true
  *         schema:
  *           type: string
+ *           pattern: ^[a-fA-F0-9]{24}$
  *     requestBody:
  *       required: true
  *       content:
@@ -90,6 +162,26 @@ const {
  *             properties:
  *               title:
  *                 type: string
+ *               description:
+ *                 type: string
+ *               author:
+ *                 type: string
+ *               trailer:
+ *                 type: string
+ *               type:
+ *                 type: string
+ *               duration:
+ *                 type: integer
+ *               releaseDate:
+ *                 type: string
+ *                 format: date
+ *                 example: 2025-03-20
+ *               genreIds:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   pattern: ^[a-fA-F0-9]{24}$
+ *                   example: 64f8a2b3c4d5e6f7890abc12
  *     responses:
  *       200:
  *         description: Cập nhật phim thành công
@@ -107,6 +199,8 @@ const {
  *         required: true
  *         schema:
  *           type: string
+ *           pattern: ^[a-fA-F0-9]{24}$
+ *           example: 64f4bd34b24882bcd0fbfb72
  *     requestBody:
  *       required: true
  *       content:
@@ -134,6 +228,8 @@ const {
  *         required: true
  *         schema:
  *           type: string
+ *           pattern: ^[a-fA-F0-9]{24}$
+ *           example: 64f4bd34b24882bcd0fbfb72
  *     responses:
  *       200:
  *         description: Xóa phim thành công
@@ -168,7 +264,7 @@ router.put('/movie/update/:id', auth, adminMiddleware, updateMovieValidation, mo
 router.patch('/movie/update/image/:id', auth, adminMiddleware, upload.single('image'), movieController.updateMovieImage);
 
 // Delete (admin)
-router.delete('/movie/delete/:id', auth, adminMiddleware, movieController.deleteMovie);
+router.delete('/movie/delete/:id', auth, adminMiddleware, validateIdParam, movieController.deleteMovie);
 
 // Extra: genres list for admin forms
 router.get('/genres', auth, adminMiddleware, async (req, res) => {

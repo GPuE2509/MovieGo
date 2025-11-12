@@ -9,16 +9,6 @@ const homeController = require('../controllers/homeController');
  *   description: Trang chủ - các API alias không có /home prefix
  */
 
-/**
- * @swagger
- * /api/v1/theaters-near:
- *   get:
- *     summary: Lấy danh sách rạp gần bạn
- *     tags: [HomeAlias]
- *     responses:
- *       200:
- *         description: Danh sách rạp gần bạn
- */
 
 /**
  * @swagger
@@ -183,7 +173,7 @@ const homeController = require('../controllers/homeController');
  */
 
 // Exact paths as per image (no /home prefix, dashed names)
-router.get('/theaters-near', homeController.getTheatersNear);
+
 router.get('/now-showing', homeController.getAllMoviesShowing);
 router.get('/now-coming', homeController.getAllMoviesComing);
 
