@@ -23,9 +23,9 @@ const { auth } = require('../../middleware/auth');
  *           schema:
  *             type: object
  *             properties:
- *               showtimeId:
+ *               showtime_id:
  *                 type: string
- *               seats:
+ *               seatIds:
  *                 type: array
  *                 items:
  *                   type: string
@@ -120,7 +120,7 @@ const { auth } = require('../../middleware/auth');
  *           schema:
  *             type: object
  *             properties:
- *               seats:
+ *               seatIds:
  *                 type: array
  *                 items:
  *                   type: string
@@ -148,7 +148,7 @@ const { auth } = require('../../middleware/auth');
  *           schema:
  *             type: object
  *             properties:
- *               paymentMethod:
+ *               paymentMethodId:
  *                 type: string
  *     responses:
  *       200:

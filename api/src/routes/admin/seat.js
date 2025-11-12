@@ -101,8 +101,9 @@ const seatController = require('../../controllers/seatController');
  *             properties:
  *               name:
  *                 type: string
- *               type:
- *                 type: string
+*               type:
+*                 type: string
+*                 example: "STANDARD"
  *     responses:
  *       200:
  *         description: Cập nhật ghế thành công
@@ -121,7 +122,7 @@ const seatController = require('../../controllers/seatController');
  *         schema:
  *           type: string
  *     responses:
- *       200:
+ *       204:
  *         description: Xóa ghế thành công
  *       404:
  *         description: Không tìm thấy ghế
@@ -133,6 +134,33 @@ const seatController = require('../../controllers/seatController');
  *   get:
  *     summary: Lấy danh sách ghế đã xóa
  *     tags: [AdminSeat]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: Trang hiện tại
+ *       - in: query
+ *         name: size
+ *         schema:
+ *           type: integer
+ *         description: Số lượng ghế mỗi trang
+ *       - in: query
+ *         name: sortBy
+ *         schema:
+ *           type: string
+ *         description: Trường sắp xếp
+ *       - in: query
+ *         name: direction
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *         description: Chiều sắp xếp
+ *       - in: query
+ *         name: keyword
+ *         schema:
+ *           type: string
+ *         description: Từ khóa tìm kiếm
  *     responses:
  *       200:
  *         description: Danh sách ghế đã xóa

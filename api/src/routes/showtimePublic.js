@@ -23,6 +23,16 @@ const { auth, adminMiddleware } = require('../middleware/auth');
  *         required: true
  *         schema:
  *           type: string
+*       - in: query
+*         name: page
+*         schema:
+*           type: integer
+*         description: Trang hiện tại
+*       - in: query
+*         name: size
+*         schema:
+*           type: integer
+*         description: Số lượng suất chiếu mỗi trang
  *     responses:
  *       200:
  *         description: Danh sách suất chiếu
@@ -40,6 +50,21 @@ const { auth, adminMiddleware } = require('../middleware/auth');
  *         required: true
  *         schema:
  *           type: string
+*       - in: query
+*         name: page
+*         schema:
+*           type: integer
+*         description: Trang hiện tại
+*       - in: query
+*         name: size
+*         schema:
+*           type: integer
+*         description: Số lượng suất chiếu mỗi trang
+*       - in: query
+*         name: date
+*         schema:
+*           type: string
+*         description: Ngày suất chiếu (YYYY-MM-DD)
  *     responses:
  *       200:
  *         description: Danh sách suất chiếu
@@ -57,6 +82,11 @@ const { auth, adminMiddleware } = require('../middleware/auth');
  *         required: true
  *         schema:
  *           type: string
+*       - in: query
+*         name: theaterId
+*         schema:
+*           type: string
+*         description: Mã rạp
  *     responses:
  *       200:
  *         description: Danh sách ngày có suất chiếu
